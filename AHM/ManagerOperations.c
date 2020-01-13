@@ -1,5 +1,6 @@
 #include "ManagerOperations.h"
 
+
 HeapManager* ManagerOperations_initialize_heap_manager(int heap_size,int heap_count) {
 	HeapManager* manager = (HeapManager*)malloc(sizeof(HeapManager));
 	if (manager != NULL) {
@@ -18,6 +19,18 @@ HeapManager* ManagerOperations_initialize_heap_manager(int heap_size,int heap_co
 
 void ManagerOperations_destroy_manager(HeapManager** manager) {
 	HeapManager* temp = *manager;
+	free(temp->heap_array);
+	free(temp->current_heap);
+	DeleteCriticalSection(&temp->manager_mutex);
+}
+
+void ManagerOperations_destroy_manager_with_heaps(HeapManager** manager) {
+	HeapManager* temp = *manager;
+	for (int i = 0; i < temp->max_heaps; i++) {
+		if (temp->heap_array[i] != NULL) {
+			HeapCreation_destroy_heap(temp->heap_array);
+		}
+	}
 	free(temp->heap_array);
 	free(temp->current_heap);
 	DeleteCriticalSection(&temp->manager_mutex);
