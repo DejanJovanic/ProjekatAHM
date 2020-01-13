@@ -1,23 +1,16 @@
 #include "ManagerOperations.h"
 
-HeapManager* ManagerOperations_initialize_heap_manager(int heap_size, int heap_count) {
+HeapManager* ManagerOperations_initialize_heap_manager(int heap_size,int heap_count) {
 	HeapManager* manager = (HeapManager*)malloc(sizeof(HeapManager));
 	if (manager != NULL) {
-		Node* head = NULL;
-		if (heap_count > 0 && heap_size > 0) {
+		if (heap_count > 0) {
 
-			HANDLE h;
-			for (int i = 0; i < heap_count; i++) {
-				h = HeapCreation_create_default_heap(heap_size);
-				if (h != NULL)
-					list_add_node(&head, h);
-			}
+			manager->heap_array = (Heap*)malloc(heap_count * sizeof(Heap));
 		}
-		if (head != NULL)
-			manager->heap_list = &head;
 		manager->heap_size = heap_size;
-		manager->heap_count = heap_count;
-		manager->current_heap = head;
+		manager->max_heaps = heap_count;
+		manager->heap_count = 0;
+		manager->current_heap = -1;
 		InitializeCriticalSection(&manager->manager_mutex);
 	}
 	return manager;
@@ -25,7 +18,7 @@ HeapManager* ManagerOperations_initialize_heap_manager(int heap_size, int heap_c
 
 void ManagerOperations_destroy_manager(HeapManager** manager) {
 	HeapManager* temp = *manager;
-	list_delete_list(temp->heap_list);
+	free(temp->heap_array);
 	free(temp->current_heap);
 	DeleteCriticalSection(&temp->manager_mutex);
 }

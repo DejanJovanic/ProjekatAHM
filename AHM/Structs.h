@@ -1,12 +1,13 @@
 #pragma once
 #include "Windows.h"
-#include "..\Collections\list.h"
 
+typedef HANDLE Heap;
 
 typedef struct manager_struct {
-	Node** heap_list;
+	Heap* heap_array;
 	int heap_size;
 	int heap_count;
-	Node* current_heap;
+	int max_heaps;
+	int current_heap;
 	CRITICAL_SECTION manager_mutex;
 } HeapManager;
