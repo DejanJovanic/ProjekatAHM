@@ -150,12 +150,12 @@
   <ItemGroup>
     <ClCompile Include="HeapAddingOperations.c" />
     <ClCompile Include="HeapManipulationOperations.c" />
-    <ClCompile Include="ManagerOperations.c" />
+    <ClCompile Include="HeapManagerOperations.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HeapAddingOperations.h" />
     <ClInclude Include="HeapManipulationOperations.h" />
-    <ClInclude Include="ManagerOperations.h" />
+    <ClInclude Include="HeapManagerOperations.h" />
     <ClInclude Include="Structs.h" />
   </ItemGroup>
   <ItemGroup>

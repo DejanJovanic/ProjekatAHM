@@ -10,4 +10,3 @@ Heap HeapCreation_create_big_heap(int heap_size);
 
 Heap HeapCreation_create_infinite_heap(int initial_commited_bytes);
 
-BOOL HeapCreation_destroy_heap(Heap heap);

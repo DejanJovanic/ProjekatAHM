@@ -15,28 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ManagerOperations.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HeapAddingOperations.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HeapManipulationOperations.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Structs.h">
+    <ClInclude Include="ManagerInitialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ManagerOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HeapAddingOperations.h">
+    <ClInclude Include="Structs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HeapManipulationOperations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ManagerInitialization.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ManagerOperations.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

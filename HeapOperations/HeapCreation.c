@@ -1,11 +1,5 @@
 #include "HeapCreation.h"
 
-BOOL HeapCreation_destroy_heap(Heap heap) {
-	if (heap != NULL) {
-		return HeapDestroy(heap);
-	}
-}
-
 Heap HeapCreation_create_default_heap(int heap_size) {
 	if (heap_size > 0)
 		return HeapCreate(0, heap_size / 4, heap_size);

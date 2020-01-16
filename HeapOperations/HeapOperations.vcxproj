@@ -20,10 +20,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HeapCreation.h" />
+    <ClInclude Include="HeapDestruction.h" />
     <ClInclude Include="HeapManipulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HeapCreation.c" />
+    <ClCompile Include="HeapDestruction.c" />
     <ClCompile Include="HeapManipulation.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
