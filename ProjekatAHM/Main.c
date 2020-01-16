@@ -8,7 +8,7 @@ int main() {
 	void* items[10000];
 	int count = 0;
 	for (int i = 0; i < 10000; i++) {
-		items[i] = thread_malloc(200000);
+		items[i] = thread_malloc(400000);
 		if (items[i] == NULL)
 			count++;
 	}
