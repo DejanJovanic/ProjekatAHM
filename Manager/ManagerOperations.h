@@ -4,7 +4,7 @@
 #include "Structs.h"
 
 extern HeapManager* manager;
-extern Dictionary* dictionary;
+extern Dictionary dictionary;
 
 void* thread_malloc(unsigned bytes);
 

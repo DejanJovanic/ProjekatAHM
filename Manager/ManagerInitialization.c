@@ -15,10 +15,8 @@ BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 		if (!ret)
 			HeapManagerOperations_destroy_manager_with_heaps(&manager);
 		else {
-			dictionary = (Dictionary*)malloc(sizeof(Dictionary));
-			if(dictionary != NULL)
-				dictionary->items = NULL;
-			InitializeCriticalSection(&dictionary->cs);
+			dictionary.items = NULL;
+			InitializeCriticalSection(&dictionary.cs);
 		}
 	}
 
@@ -33,12 +31,11 @@ BOOL ManagerInitialization_destroy_manager()
 		HeapManagerOperations_destroy_manager_with_heaps(&manager);
 		free(manager);
 		DictItem* current_item, * tmp;
-		HASH_ITER(hh, dictionary->items, current_item, tmp) {
-			HASH_DEL(dictionary->items, current_item);  /* delete; users advances to next */
+		HASH_ITER(hh, dictionary.items, current_item, tmp) {
+			HASH_DEL(dictionary.items, current_item);  /* delete; users advances to next */
 			free(current_item);            /* optional- if you want to free  */
 		}
-		DeleteCriticalSection(&dictionary->cs);
-		free(dictionary);
+		DeleteCriticalSection(&dictionary.cs);
 		ret = TRUE;
 	}
 	return ret;

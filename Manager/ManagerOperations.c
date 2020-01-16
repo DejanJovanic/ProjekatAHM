@@ -10,9 +10,9 @@ void* thread_malloc(unsigned bytes) {
 			if (pointer != NULL && item != NULL) {
 				item->heap = heap;
 				item->pointer = pointer;
-				EnterCriticalSection(&dictionary->cs);
-				HASH_ADD_PTR(dictionary->items, pointer, item);
-				LeaveCriticalSection(&dictionary->cs);
+				EnterCriticalSection(&dictionary.cs);
+				HASH_ADD_PTR(dictionary.items, pointer, item);
+				LeaveCriticalSection(&dictionary.cs);
 			}
 			
 			return pointer;
@@ -21,25 +21,21 @@ void* thread_malloc(unsigned bytes) {
 			return NULL;
 		}
 	}
-	else
-		exit(-1);
 }
 
 void thread_free(void* pointer) {
 	if (pointer != NULL) {
 		DictItem* ptr = NULL;
-		EnterCriticalSection(&dictionary->cs);
-		HASH_FIND_PTR(dictionary->items, &pointer, ptr);
+		EnterCriticalSection(&dictionary.cs);
+		HASH_FIND_PTR(dictionary.items, &pointer, ptr);
 		if (ptr != NULL) {
-			HASH_DEL(dictionary->items, ptr);	
+			HASH_DEL(dictionary.items, ptr);	
 		}
-		LeaveCriticalSection(&dictionary->cs);
+		LeaveCriticalSection(&dictionary.cs);
 		if (ptr != NULL) {
 			HeapManipulation_free_memory(pointer, ptr->heap);
 			free(ptr);
-		}
-
-		
+		}		
 	}
 	else
 		exit(-1);

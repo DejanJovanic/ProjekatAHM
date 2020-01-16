@@ -4,7 +4,7 @@
 #include "Structs.h"
 
 HeapManager* manager;
-Dictionary* dictionary;
+Dictionary dictionary;
 
 
 BOOL ManagerInitialization_initialize_manager(unsigned heap_count);
