@@ -9,6 +9,8 @@ typedef struct dict_item {
 } DictItem;
 
 typedef struct dict {
-	DictItem* items;
-	CRITICAL_SECTION cs;
+	BOOL _is_initialized;
+	DictItem* _items;
+	Heap _dict_heap;
+	CRITICAL_SECTION _cs;
 } Dictionary;

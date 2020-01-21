@@ -1,42 +1,45 @@
 #include "ManagerOperations.h"
 
 void* thread_malloc(unsigned bytes) {
-	if (manager != NULL) {
-		Heap heap;
+	if (_manager == NULL && !_dictionary._is_initialized)
+		exit(MANAGER_UNINITIALIZED_ERROR);
+
+	Heap heap;
 		
-		if (HeapManipulationOperations_get_heap(manager, &heap)) {
-			void* pointer =	HeapManipulation_allocate_memory(bytes, heap);
-			DictItem* item = (DictItem*)malloc(sizeof(DictItem));
-			if (pointer != NULL && item != NULL) {
-				item->heap = heap;
-				item->pointer = pointer;
-				EnterCriticalSection(&dictionary.cs);
-				HASH_ADD_PTR(dictionary.items, pointer, item);
-				LeaveCriticalSection(&dictionary.cs);
-			}
+	if (HeapManipulationOperations_get_heap(_manager, &heap)) {
+		void* pointer =	HeapManipulation_allocate_memory(bytes, heap);
+		DictItem* item = HeapManipulation_allocate_memory(sizeof(DictItem),_dictionary._dict_heap);
+		if (pointer != NULL && item != NULL) {
+			item->heap = heap;
+			item->pointer = pointer;
+			EnterCriticalSection(&_dictionary._cs);
+			HASH_ADD_PTR(_dictionary._items, pointer, item);
+			LeaveCriticalSection(&_dictionary._cs);
+		}
 			
-			return pointer;
-		}
-		else {
-			return NULL;
-		}
+		return pointer;
 	}
+	else 
+		return NULL;
 }
 
 void thread_free(void* pointer) {
-	if (pointer != NULL) {
-		DictItem* ptr = NULL;
-		EnterCriticalSection(&dictionary.cs);
-		HASH_FIND_PTR(dictionary.items, &pointer, ptr);
-		if (ptr != NULL) {
-			HASH_DEL(dictionary.items, ptr);	
-		}
-		LeaveCriticalSection(&dictionary.cs);
-		if (ptr != NULL) {
-			HeapManipulation_free_memory(pointer, ptr->heap);
-			free(ptr);
-		}		
+	if (pointer == NULL)
+		exit(NULL_SENT_ERROR);
+
+	if (!_dictionary._is_initialized && _manager == NULL)
+		exit(MANAGER_UNINITIALIZED_ERROR);
+
+	DictItem* ptr = NULL;
+	EnterCriticalSection(&_dictionary._cs);
+	HASH_FIND_PTR(_dictionary._items, &pointer, ptr);
+	if (ptr != NULL) {
+		HASH_DEL(_dictionary._items, ptr);	
 	}
-	else
-		exit(-1);
+	LeaveCriticalSection(&_dictionary._cs);
+	if (ptr != NULL) {
+		HeapManipulation_free_memory(pointer, ptr->heap);
+		HeapManipulation_free_memory(ptr, _dictionary._dict_heap);
+	}		
+
 }

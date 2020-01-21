@@ -2,21 +2,29 @@
 
 BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 	BOOL ret = TRUE;
-	manager = HeapManagerOperations_initialize_heap_manager(0, heap_count);
-	if (manager != NULL) {
+	_manager = HeapManagerOperations_initialize_heap_manager(0, heap_count);
+	if (_manager != NULL) {
 		Heap heap;
 
 		for (unsigned i = 0; i < heap_count; i++) {
-			if (!HeapAddingOperations_add_infinite_heap(manager, &heap, 50000000)) {
+			if (!HeapAddingOperations_add_infinite_heap(_manager, &heap, 50000000)) {
 				ret = FALSE;
 				break;
 			}
 		}
 		if (!ret)
-			HeapManagerOperations_destroy_manager_with_heaps(&manager);
+			HeapManagerOperations_destroy_manager_with_heaps(&_manager);
 		else {
-			dictionary.items = NULL;
-			InitializeCriticalSection(&dictionary.cs);
+			_dictionary._items = NULL;
+			InitializeCriticalSection(&_dictionary._cs);
+			if ((_dictionary._dict_heap = HeapCreation_create_infinite_heap(5000)) != NULL)
+				_dictionary._is_initialized = TRUE;
+			else {
+				DeleteCriticalSection(&_dictionary._cs);
+				HeapManagerOperations_destroy_manager_with_heaps(&_manager);
+				ret = FALSE;
+			}
+				
 		}
 	}
 
@@ -27,16 +35,21 @@ BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 BOOL ManagerInitialization_destroy_manager()
 {
 	BOOL ret = FALSE;
-	if (manager != NULL) {
-		HeapManagerOperations_destroy_manager_with_heaps(&manager);
-		free(manager);
-		DictItem* current_item, * tmp;
-		HASH_ITER(hh, dictionary.items, current_item, tmp) {
-			HASH_DEL(dictionary.items, current_item);  /* delete; users advances to next */
-			free(current_item);            /* optional- if you want to free  */
-		}
-		DeleteCriticalSection(&dictionary.cs);
+	if (_manager != NULL) {
+		HeapManagerOperations_destroy_manager_with_heaps(&_manager);
+		free(_manager);
 		ret = TRUE;
 	}
+	if (_dictionary._is_initialized) {
+		DictItem* current_item, * tmp;
+		HASH_ITER(hh, _dictionary._items, current_item, tmp) {
+			HASH_DEL(_dictionary._items, current_item);  /* delete; users advances to next */
+			free(current_item);            /* optional- if you want to free  */
+		}
+		DeleteCriticalSection(&_dictionary._cs);
+		_dictionary._is_initialized = FALSE;
+		ret = TRUE;
+	}
+	
 	return ret;
 }
