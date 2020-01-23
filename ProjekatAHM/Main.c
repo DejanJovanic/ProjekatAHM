@@ -6,7 +6,6 @@
 
 int main() {
 	ManagerInitialization_initialize_manager(5); //5 je broj hipova
-
 	clock_t start_time, end_time;
 	double cpu_time_used;
 

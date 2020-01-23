@@ -147,9 +147,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="HashTable.c" />
     <ClCompile Include="list.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="HashTable.h" />
     <ClInclude Include="list.h" />
     <ClInclude Include="uthash.h" />
   </ItemGroup>
