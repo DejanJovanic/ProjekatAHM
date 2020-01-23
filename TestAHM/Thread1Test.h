@@ -7,4 +7,4 @@
 
 DWORD WINAPI Test1(LPVOID lpParam);
 void StartTest1();
-//DWORD WINAPI Test1Malloc(LPVOID lpParam);
+DWORD WINAPI Test1Malloc(LPVOID lpParam);

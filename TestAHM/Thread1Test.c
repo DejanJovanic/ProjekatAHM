@@ -22,8 +22,8 @@ void StartTest1()
 	printf("\n Time for allocate and free with 1 thread in seconds %f\n", cpu_time_used);
 	CloseHandle(thread1);
 	CloseHandle(hSemaphore);
+	
 	ManagerInitialization_destroy_manager();
-
 	/*hSemaphore = CreateSemaphore(0, 0, 1, NULL);
 	start_time = clock();
 	thread1 = CreateThread(NULL, 0, &Test1Malloc, NULL, 0, &id);
@@ -31,7 +31,8 @@ void StartTest1()
 	end_time = clock();
 
 	cpu_time_used = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
-
+	CloseHandle(thread1);
+	CloseHandle(hSemaphore);
 	printf("\n Time for allocate and free with 1 thread with MALLOC in seconds %f\n", cpu_time_used);*/
 	
 }
@@ -43,7 +44,8 @@ DWORD WINAPI Test1(LPVOID lpParam) {
 	}
 
 	for (int i = 0; i < 10000; i++) {
-		thread_free(items[i]);
+		if(items[i] != NULL)
+			thread_free(items[i]);
 	}
 	
 	ReleaseSemaphore(hSemaphore, 1, NULL);
@@ -51,7 +53,7 @@ DWORD WINAPI Test1(LPVOID lpParam) {
 
 }
 
-/*DWORD WINAPI Test1Malloc(LPVOID lpParam)
+DWORD WINAPI Test1Malloc(LPVOID lpParam)
 {
 	void* items[10000];
 
@@ -63,6 +65,7 @@ DWORD WINAPI Test1(LPVOID lpParam) {
 	for (int i = 0; i < 10000; i++) {
 		free(items[i]);
 	}
+	ReleaseSemaphore(hSemaphore, 1, NULL);
+	return 0;
 
-
-}*/
+}

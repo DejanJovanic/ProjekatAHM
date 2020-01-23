@@ -8,13 +8,17 @@ void* thread_malloc(unsigned bytes) {
 		
 	if (HeapManipulationOperations_get_heap(_manager, &heap)) {
 		void* pointer =	HeapManipulation_allocate_memory(bytes, heap);
-		DictItem* item = HeapManipulation_allocate_memory(sizeof(DictItem),_dictionary._dict_heap);
-		if (pointer != NULL && item != NULL) {
-			item->heap = heap;
-			item->pointer = pointer;
-			EnterCriticalSection(&_dictionary._cs);
-			HASH_ADD_PTR(_dictionary._items, pointer, item);
-			LeaveCriticalSection(&_dictionary._cs);
+
+		if (pointer != NULL) {
+			DictItem* item = HeapManipulation_allocate_memory(sizeof(DictItem), _dictionary._dict_heap);
+			if (item != NULL) {
+				item->heap = heap;
+				item->pointer = pointer;
+				EnterCriticalSection(&_dictionary._cs);
+				HASH_ADD_PTR(_dictionary._items, pointer, item);
+				LeaveCriticalSection(&_dictionary._cs);
+			}
+
 		}
 			
 		return pointer;

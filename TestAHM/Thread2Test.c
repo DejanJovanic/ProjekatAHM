@@ -43,7 +43,7 @@ void StartTest2()
 	a = 0;
 	temp = 0;
 	ManagerInitialization_destroy_manager();
-
+	DeleteCriticalSection(&mutex);
 	/*start_time = clock();
 	for (int i = 0; i < 2; i++) {
 
@@ -74,7 +74,8 @@ DWORD WINAPI Test2(LPVOID lpParam) {
 	}
 
 	for (int i = 0; i < 10000; i++) {
-		thread_free(items[i]);
+		if(items[i] != NULL)
+			thread_free(items[i]);
 	}
 
 	EnterCriticalSection(&mutex);
