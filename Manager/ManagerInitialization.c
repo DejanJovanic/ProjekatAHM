@@ -12,8 +12,8 @@ void* node_allocate_function() {
 void* bucket_list_allocating_function(int buckets) {
 	return HeapManipulation_allocate_memory(sizeof(HashNode*) * buckets, _dictionary._dict_heap);
 }
-void bucket_list_free_function(HashTable* table) {
-	HeapManipulation_free_memory(table->_table, _dictionary._dict_heap);
+void bucket_list_free_function(HashNode** table) {
+	HeapManipulation_free_memory(table, _dictionary._dict_heap);
 }
 BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 	BOOL ret = TRUE;

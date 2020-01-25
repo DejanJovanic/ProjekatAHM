@@ -40,8 +40,34 @@ HashNode* HashTable_get(HashTable* table, void* key) {
 	return node;
 }
 
+void HashTable_rebuild_table(HashTable* table) {
+	HashNode** old_table, * old_hash, * temp;
+	unsigned int old_size, h, i;
+
+	old_table = table->_table;
+	old_size = table->size;
+	table->_table = table->bucket_list_allocating_function(old_size * 2);
+	for (int i = 0; i < old_size * 2; i++) {
+		table->_table[i] = NULL;
+	}
+	table->size *= 2;
+	for (i = 0; i < old_size; i++) {
+		old_hash = old_table[i];
+		while (old_hash) {
+			temp = old_hash;
+			old_hash = old_hash->next;
+			h = _HashTable_get_hash(temp->key) % table->size;
+			temp->next = table->_table[h];
+			table->_table[h] = temp;
+		}
+	}
+	table->bucket_list_free_function(old_table);
+}
+
 BOOL HashTable_insert(HashTable* table, void* key, void* value) {
 	if (HashTable_get(table, key) == NULL) {
+		while (table->entries >= table->size * 0.75)
+			HashTable_rebuild_table(table);
 		uint32_t index = _HashTable_get_hash(key) % table->size;
 		HashNode* node = (HashNode*)table->node_allocate_function();
 		node->key = key;
@@ -54,6 +80,7 @@ BOOL HashTable_insert(HashTable* table, void* key, void* value) {
 	else
 		return FALSE;
 }
+
 
 BOOL HashTable_delete(HashTable* table, void* key,void** out_value) {
 	HashNode* node;
@@ -93,7 +120,7 @@ BOOL HashTable_deinitialize_table(HashTable* table) {
 			current = next;
 		}
 	}
-	table->bucket_list_free_function(table);
+	table->bucket_list_free_function(table->_table);
 	table->size = 0;
 	table->entries = 0;
 	return TRUE;

@@ -12,7 +12,7 @@ typedef struct hash_table {
 	int size;
 	int entries;
 	void*(*bucket_list_allocating_function)(int);
-	void(*bucket_list_free_function)(struct hash_table*);
+	void(*bucket_list_free_function)(HashNode**);
 	BOOL(*key_comparer_function)(void*, void*);
 	void(*node_free_function)(HashNode*);
 	void*(*node_allocate_function)();
@@ -21,5 +21,5 @@ typedef struct hash_table {
 BOOL HashTable_delete(HashTable* table, void* key, void** out_value);
 BOOL HashTable_insert(HashTable* table, void* key,void* value);
 HashNode* HashTable_get(HashTable* table, void* key);
-BOOL HashTable_initialize_table(HashTable* table, unsigned int buckets,BOOL (*key_comparer)(void*,void*), void* (*bucket_list_allocating_function)(int), void(*bucket_list_free_function)(HashTable*), void*(*node_allocate_function)(), void(*node_free_function)(HashNode*));
+BOOL HashTable_initialize_table(HashTable* table, unsigned int buckets,BOOL (*key_comparer)(void*,void*), void* (*bucket_list_allocating_function)(int), void(*bucket_list_free_function)(HashNode**), void*(*node_allocate_function)(), void(*node_free_function)(HashNode*));
 BOOL HashTable_deinitialize_table(HashTable* table);

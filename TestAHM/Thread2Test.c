@@ -70,7 +70,7 @@ DWORD WINAPI Test2(LPVOID lpParam) {
 	void* items[10000];
 
 	for (int i = 0; i < 10000; i++) {
-		items[i] = thread_malloc(200000);
+		items[i] = thread_malloc(400000);
 	}
 
 	for (int i = 0; i < 10000; i++) {
