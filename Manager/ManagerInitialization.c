@@ -3,7 +3,18 @@
 BOOL compare_keys(void* key1, void* key2) {
 	return key1 == key2;
 }
-
+void node_free_function(HashNode* node) {
+	HeapManipulation_free_memory(node, _dictionary._dict_heap);
+}
+void* node_allocate_function() {
+	return HeapManipulation_allocate_memory(sizeof(HashNode), _dictionary._dict_heap);
+}
+void* bucket_list_allocating_function(int buckets) {
+	return HeapManipulation_allocate_memory(sizeof(HashNode*) * buckets, _dictionary._dict_heap);
+}
+void bucket_list_free_function(HashTable* table) {
+	HeapManipulation_free_memory(table->_table, _dictionary._dict_heap);
+}
 BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 	BOOL ret = TRUE;
 	_manager = HeapManagerOperations_initialize_heap_manager(0, heap_count);
@@ -22,7 +33,7 @@ BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 			InitializeCriticalSection(&_dictionary._cs);
 			if ((_dictionary._dict_heap = HeapCreation_create_infinite_heap(5000)) != NULL) {
 				_dictionary._table = HeapManipulation_allocate_memory(sizeof(HashTable), _dictionary._dict_heap);
-				if (_dictionary._table != NULL && HashTable_initialize_table(_dictionary._table, 1000,compare_keys))
+				if (_dictionary._table != NULL && HashTable_initialize_table(_dictionary._table, 1000,compare_keys,bucket_list_allocating_function,bucket_list_free_function,node_allocate_function,node_free_function))
 					_dictionary._is_initialized = TRUE;			
 			
 			}
@@ -56,15 +67,7 @@ BOOL ManagerInitialization_destroy_manager()
 		HashNode* current;
 		HashNode* next;
 		EnterCriticalSection(&_dictionary._cs);
-		for (int i = 0; i < _dictionary._table->size; i++) {
-			current = _dictionary._table->_table[i];
-			while (current != NULL) {
-				next = current->next;
-				HeapManipulation_free_memory(current, _dictionary._dict_heap);
-				current = next;
-			}
-		}
-		free(_dictionary._table->_table);
+		HashTable_deinitialize_table(_dictionary._table);
 		HeapManipulation_free_memory(_dictionary._table, _dictionary._dict_heap);
 		LeaveCriticalSection(&_dictionary._cs);
 		DeleteCriticalSection(&_dictionary._cs);

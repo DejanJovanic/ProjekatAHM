@@ -10,16 +10,16 @@ void* thread_malloc(unsigned bytes) {
 		void* pointer =	HeapManipulation_allocate_memory(bytes, heap);
 
 		if (pointer != NULL) {
-			HashNode* item = HeapManipulation_allocate_memory(sizeof(HashNode), _dictionary._dict_heap);
+			//HashNode* item = HeapManipulation_allocate_memory(sizeof(HashNode), _dictionary._dict_heap);
 			//HashNode* item = (HashNode*)malloc(sizeof(HashNode));
-			if (item != NULL) {
-				item->value = heap;
-				item->key = pointer;
+			//if (item != NULL) {
+				/*item->value = heap;
+				item->key = pointer;*/
 				EnterCriticalSection(&_dictionary._cs);
 				//HASH_ADD_PTR(_dictionary._items, pointer, item);
-				HashTable_insert(_dictionary._table, item);
+				HashTable_insert(_dictionary._table, pointer,heap);
 				LeaveCriticalSection(&_dictionary._cs);
-			}
+			//}
 
 		}
 			
@@ -36,13 +36,13 @@ void thread_free(void* pointer) {
 	if (!_dictionary._is_initialized && _manager == NULL)
 		exit(MANAGER_UNINITIALIZED_ERROR);
 
-	HashNode* node = NULL;
+	Heap heap = NULL;
 	EnterCriticalSection(&_dictionary._cs);
 	
-	if (HashTable_delete(_dictionary._table,pointer,&node)) {
+	if (HashTable_delete(_dictionary._table,pointer,&heap)) {
 		LeaveCriticalSection(&_dictionary._cs);
-		HeapManipulation_free_memory(pointer, node->value);
-		HeapManipulation_free_memory(node, _dictionary._dict_heap);
+		HeapManipulation_free_memory(pointer, heap);
+		//HeapManipulation_free_memory(node, _dictionary._dict_heap);
 	}
 	else
 		LeaveCriticalSection(&_dictionary._cs);
