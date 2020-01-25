@@ -12,7 +12,7 @@ inline uint32_t _HashTable_get_hash(void* key) {
 	return a >> ((sizeof(uintptr_t) - sizeof(uint32_t)) * 8);
 }
 
-BOOL HashTable_initialize_table(HashTable* table, unsigned int buckets, BOOL(*key_comparer)(void*, void*), void* (*bucket_list_allocating_function)(int), void(*bucket_list_free_function)(HashTable*), void* (*node_allocate_function)(), void(*node_free_function)(HashNode*)) {
+BOOL HashTable_initialize_table(HashTable* table, unsigned int buckets, BOOL(*key_comparer)(void*, void*), void* (*bucket_list_allocating_function)(int), void(*bucket_list_free_function)(HashNode**), void* (*node_allocate_function)(), void(*node_free_function)(HashNode*)) {
 	BOOL ret = TRUE;
 	table->entries = 0;
 	table->key_comparer_function = key_comparer;
