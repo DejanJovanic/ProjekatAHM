@@ -1,6 +1,6 @@
 #include "ManagerInitialization.h"
 
-BOOL compare_keys(void* key1, void* key2) {
+inline BOOL compare_keys(void* key1, void* key2) {
 	return key1 == key2;
 }
 inline void node_free_function(HashNode* node) {
@@ -12,8 +12,8 @@ inline void* node_allocate_function() {
 inline void* bucket_list_allocating_function(int buckets) {
 	return HeapManipulation_allocate_memory(sizeof(HashNode*) * buckets, _dictionary._dict_heap);
 }
-inline void bucket_list_free_function(HashTable* table) {
-	HeapManipulation_free_memory(table->_table, _dictionary._dict_heap);
+inline void bucket_list_free_function(HashNode** table) {
+	HeapManipulation_free_memory(table, _dictionary._dict_heap);
 }
 BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 	BOOL ret = TRUE;
@@ -31,7 +31,7 @@ BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 			HeapManagerOperations_destroy_manager_with_heaps(&_manager);
 		else {
 			InitializeCriticalSection(&_dictionary._cs);
-			if ((_dictionary._dict_heap = HeapCreation_create_infinite_heap(5000)) != NULL) {
+			if ((_dictionary._dict_heap = HeapCreation_create_infinite_heap_unlocked(5000)) != NULL) {
 				_dictionary._table = HeapManipulation_allocate_memory(sizeof(HashTable), _dictionary._dict_heap);
 				if (_dictionary._table != NULL && HashTable_initialize_table(_dictionary._table, 1000,compare_keys,bucket_list_allocating_function,bucket_list_free_function,node_allocate_function,node_free_function))
 					_dictionary._is_initialized = TRUE;			
@@ -59,11 +59,6 @@ BOOL ManagerInitialization_destroy_manager()
 		ret = TRUE;
 	}
 	if (_dictionary._is_initialized) {
-		//DictItem* current_item, * tmp;
-		//HASH_ITER(hh, _dictionary._items, current_item, tmp) {
-		//	HASH_DEL(_dictionary._items, current_item);  /* delete; users advances to next */
-		//	free(current_item);            /* optional- if you want to free  */
-		//}
 		HashNode* current;
 		HashNode* next;
 		EnterCriticalSection(&_dictionary._cs);
