@@ -1,7 +1,15 @@
 #include "HashTable.h"
 
-uint32_t _HashTable_get_hash(void* key) {
-	return ((uintptr_t)key * UINT32_C(2654435769)) >> (5 + ((sizeof(uintptr_t) - sizeof(uint32_t)) * 8));
+inline uint32_t _HashTable_get_hash(void* key) {
+	uintptr_t a = (uintptr_t)key;
+	a -= (a << 6);
+	a ^= (a >> 17);
+	a -= (a << 9);
+	a ^= (a << 4);
+	a -= (a << 3);
+	a ^= (a << 10);
+	a ^= (a >> 15);
+	return a >> ((sizeof(uintptr_t) - sizeof(uint32_t)) * 8);
 }
 
 BOOL HashTable_initialize_table(HashTable* table, unsigned int buckets, BOOL(*key_comparer)(void*, void*), void* (*bucket_list_allocating_function)(int), void(*bucket_list_free_function)(HashTable*), void* (*node_allocate_function)(), void(*node_free_function)(HashNode*)) {
@@ -41,24 +49,25 @@ HashNode* HashTable_get(HashTable* table, void* key) {
 }
 
 void HashTable_rebuild_table(HashTable* table) {
-	HashNode** old_table, * old_hash, * temp;
-	unsigned int old_size, h, i;
+	HashNode** old_table, * next, * current;
+	unsigned int old_size, index, i;
 
 	old_table = table->_table;
 	old_size = table->size;
 	table->_table = table->bucket_list_allocating_function(old_size * 2);
-	for (int i = 0; i < old_size * 2; i++) {
+	table->size <<= 1;
+	for (int i = 0; i < table->size; i++) {
 		table->_table[i] = NULL;
 	}
-	table->size *= 2;
+	
 	for (i = 0; i < old_size; i++) {
-		old_hash = old_table[i];
-		while (old_hash) {
-			temp = old_hash;
-			old_hash = old_hash->next;
-			h = _HashTable_get_hash(temp->key) % table->size;
-			temp->next = table->_table[h];
-			table->_table[h] = temp;
+		next = old_table[i];
+		while (next) {
+			current = next;
+			next = next->next;
+			index = _HashTable_get_hash(current->key) % table->size;
+			current->next = table->_table[index];
+			table->_table[index] = current;
 		}
 	}
 	table->bucket_list_free_function(old_table);

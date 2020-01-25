@@ -10,3 +10,5 @@ Heap HeapCreation_create_big_heap(int heap_size);
 
 Heap HeapCreation_create_infinite_heap(int initial_commited_bytes);
 
+Heap HeapCreation_create_infinite_heap_unlocked(int initial_commited_bytes);
+

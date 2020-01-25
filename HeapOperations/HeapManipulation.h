@@ -4,6 +4,6 @@
 
 typedef HANDLE Heap;
 
-void* HeapManipulation_allocate_memory(int bytes, Heap heap);
+extern void* HeapManipulation_allocate_memory(int bytes, Heap heap);
 
-BOOL HeapManipulation_free_memory(void* pointer, Heap heap);
+extern BOOL HeapManipulation_free_memory(void* pointer, Heap heap);

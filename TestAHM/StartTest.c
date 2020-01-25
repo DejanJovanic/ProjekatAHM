@@ -17,5 +17,6 @@ int main() {
 	StartTest10();
 	StartTest20();
 	StartTest50();
+	getchar();
 	return 0;
 }
