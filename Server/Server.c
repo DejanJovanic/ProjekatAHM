@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "../DataSerialization/DataSerializationOperations.h"
 #include "../BaseOperations/BaseOperations.h"
+#include "../DataCollections/List.h"
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
@@ -14,17 +15,24 @@
 #define DEFAULT_BUFLEN 2
 #define DEFAULT_PORT "27016"
 
-void PrintList(pak* head) {
 
-	while (head != NULL) {
-		printf("%d\t", head->num);
-		head = head->next;
-	}
-
-}
-
-int  main(void) 
+int  main(void)
 {
+	/*
+	pak* head = NULL;
+	pak* tail = NULL;
+	char* c[10];
+	for (int i = 0; i < 10; i++) {
+		c[i] = (char *)malloc(2* sizeof(char));
+		c[i][0] = ('0' + i);
+		c[i][1] = 0;
+		Push(&head, &tail, 2, c[i]);
+	}
+	
+	pak p = Pop(&head, &tail);
+	printf(p.data);
+	*/
+	
     SOCKET listenSocket = INVALID_SOCKET;
     SOCKET acceptedSocket = INVALID_SOCKET;
     int iResult;
@@ -107,11 +115,11 @@ int  main(void)
 
         do
         {
-			CustomSelect(acceptedSocket, 1);
-            CustomRecieve(acceptedSocket, &recievedData, &brojBajtova);
+			CustomSelect(acceptedSocket, 'r');
+            brojBajtova = CustomRecieve(acceptedSocket, &recievedData);
 
 			Deserialize(&head, &tail, recievedData, brojBajtova);
-			PrintList(head);
+			Data_print_list(head);
 
         } while (iResult > 0);
 

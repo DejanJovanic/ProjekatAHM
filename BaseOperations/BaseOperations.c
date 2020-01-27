@@ -56,16 +56,16 @@ void CustomSelect(SOCKET s, char operation) {
 
 }
 
-void CustomSend(SOCKET s, char* niz, int* brojBajtova) {
+void CustomSend(SOCKET s, char* niz, int broj_bajtova) {
 	int iResult = 0;
-	int bytesSent = 0;
-	int bytesToSend = *brojBajtova;
+	int poslato_bajtova = 0;
+	
 	CustomSelect(s, 'w');
-	iResult = send(s, (char*)&bytesToSend, 4, NULL);
+	iResult = send(s, (char*)&broj_bajtova, 4, NULL);
 
 	do {
 		CustomSelect(s, 'w');
-		iResult = send(s, niz + bytesSent, *brojBajtova - bytesSent, NULL);
+		iResult = send(s, niz + poslato_bajtova, broj_bajtova - poslato_bajtova, NULL);
 
 		if (iResult == 0) {
 
@@ -76,9 +76,9 @@ void CustomSend(SOCKET s, char* niz, int* brojBajtova) {
 			return;
 		}
 
-		bytesSent += iResult;
+		poslato_bajtova += iResult;
 
-	} while (bytesSent < *brojBajtova);
+	} while (poslato_bajtova < broj_bajtova);
 
 	printf("pposlao sam\n");
 	getc(stdin);
@@ -86,7 +86,7 @@ void CustomSend(SOCKET s, char* niz, int* brojBajtova) {
 	return;
 }
 
-void CustomRecieve(SOCKET s, char** niz, int* brojBajta) {
+int CustomRecieve(SOCKET s, char** niz) {
 
 	int iResult = 0;
 	int bytesRecieved = 0;
@@ -97,14 +97,14 @@ void CustomRecieve(SOCKET s, char** niz, int* brojBajta) {
 	iResult = recv(s, buff, 4, NULL);
 
 	//pocetnu adresu prihvatnog bafera kastujem na int* (4 bajta) i dereferenciram kako bih dobio kolicinu podatka
-	*brojBajta = *((int*)buff);
+	int brojBajta = *((int*)buff);
 	free(buff);
-	*niz = (char*)malloc(*brojBajta);
+	*niz = (char*)malloc(brojBajta);
 
 
 	do {
 		CustomSelect(s, 'r');
-		iResult = recv(s, *niz + bytesRecieved, *brojBajta - bytesRecieved, NULL);
+		iResult = recv(s, *niz + bytesRecieved, brojBajta - bytesRecieved, NULL);
 
 		if (iResult == 0) {
 			continue;
@@ -116,7 +116,7 @@ void CustomRecieve(SOCKET s, char** niz, int* brojBajta) {
 
 		bytesRecieved += iResult;
 
-	} while (bytesRecieved < *brojBajta);
+	} while (bytesRecieved < brojBajta);
 
-	return;
+	return brojBajta;
 }

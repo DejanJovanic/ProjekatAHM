@@ -1,13 +1,5 @@
 #pragma once
-
-typedef struct Paket {
-	int num;		// number
-	struct Paket* next;
-}pak;
-
-typedef struct ZPaket {
-	int num;		// number
-}zpak;
+#include "../DataCollections/List.h"
 
 void Serialize(pak*, zpak**, int);
 void Deserialize(pak**, pak**, char*, int);
