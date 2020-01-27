@@ -2,7 +2,7 @@
 
 
 /* This function calculates (ab)%c */
-int modulo(int a, int b, int c) {
+int _HashTable_modulo(int a, int b, int c) {
 	long long x = 1, y = a; // long long is taken to avoid overflow of intermediate results
 	while (b > 0) {
 		if (b % 2 == 1) {
@@ -15,7 +15,7 @@ int modulo(int a, int b, int c) {
 }
 
 /* this function calculates (a*b)%c taking into account that a*b might overflow */
-long long mulmod(long long a, long long b, long long c) {
+long long _HashTable_mulmod(long long a, long long b, long long c) {
 	long long x = 0, y = a % c;
 	while (b > 0) {
 		if (b % 2 == 1) {
@@ -28,7 +28,7 @@ long long mulmod(long long a, long long b, long long c) {
 }
 
 /* Miller-Rabin primality test, iteration signifies the accuracy of the test */
-BOOL Miller(long long p, int iteration) {
+BOOL _HashTable_miller_rabin(long long p, int iteration) {
 	if (p < 2) {
 		return FALSE;
 	}
@@ -41,9 +41,9 @@ BOOL Miller(long long p, int iteration) {
 	}
 	for (int i = 0; i < iteration; i++) {
 		long long a = rand() % (p - 1) + 1, temp = s;
-		long long mod = modulo(a, temp, p);
+		long long mod = _HashTable_modulo(a, temp, p);
 		while (temp != p - 1 && mod != 1 && mod != p - 1) {
-			mod = mulmod(mod, mod, p);
+			mod = _HashTable_mulmod(mod, mod, p);
 			temp *= 2;
 		}
 		if (mod != p - 1 && temp % 2 == 0) {
@@ -64,29 +64,7 @@ inline uint32_t _HashTable_get_hash(void* key) {
 	a ^= (a >> 15);
 	return a >> ((sizeof(uintptr_t) - sizeof(uint32_t)) * 8);
 }
-void* SieveOfEratosthenes(int n)
-{
-	// Create a boolean array "prime[0..n]" and initialize 
-	// all entries it as true. A value in prime[i] will 
-	// finally be false if i is Not a prime, else true. 
-	BOOL* primes = (BOOL*)malloc(sizeof(BOOL) * (n + 1));
-	memset(primes, TRUE, sizeof(BOOL) * (n + 1));
 
-	for (int p = 2; p * p <= n; p++)
-	{
-		// If prime[p] is not changed, then it is a prime 
-		if (primes[p] == TRUE)
-		{
-			// Update all multiples of p greater than or  
-			// equal to the square of it 
-			// numbers which are multiple of p and are 
-			// less than p^2 are already been marked.  
-			for (int i = p * p; i <= n; i += p)
-				primes[i] = FALSE;
-		}
-	}
-	return primes;
-}
 BOOL HashTable_initialize_table(HashTable* table, unsigned int buckets, BOOL(*key_comparer)(void*, void*), void* (*bucket_list_allocating_function)(int), void(*bucket_list_free_function)(HashNode**), void* (*node_allocate_function)(), void(*node_free_function)(HashNode*)) {
 	BOOL ret = TRUE;
 	table->entries = 0;
@@ -101,7 +79,6 @@ BOOL HashTable_initialize_table(HashTable* table, unsigned int buckets, BOOL(*ke
 		table->size = buckets;
 		for (int i = 0; i < buckets; i++)
 			table->_table[i] = NULL;
-		table->primes = SieveOfEratosthenes(1000000);
 	}
 	else
 		ret = FALSE;
@@ -122,7 +99,7 @@ HashNode* HashTable_get(HashTable* table, void* key) {
 	return node;
 }
 
-void HashTable_rebuild_table(HashTable* table) {
+void _HashTable_rebuild_table(HashTable* table) {
 	HashNode** old_table, * next, * current;
 	unsigned int old_size, index, i;
 
@@ -132,7 +109,7 @@ void HashTable_rebuild_table(HashTable* table) {
 	if (new_size % 2 == 0)
 		new_size++;
 	for (; new_size < 4 * old_size; new_size += 2)
-		if (Miller(new_size, 20))
+		if (_HashTable_miller_rabin(new_size, 20))
 			break;
 	//if (new_size <= 1000000){
 	//	while (TRUE) {
@@ -164,7 +141,7 @@ void HashTable_rebuild_table(HashTable* table) {
 BOOL HashTable_insert(HashTable* table, void* key, void* value) {
 	if (HashTable_get(table, key) == NULL) {
 		while (table->entries >= table->size * 0.75)
-			HashTable_rebuild_table(table);
+			_HashTable_rebuild_table(table);
 		uint32_t index = _HashTable_get_hash(key) % table->size;
 		HashNode* node = (HashNode*)table->node_allocate_function();
 		node->key = key;
@@ -220,6 +197,5 @@ BOOL HashTable_deinitialize_table(HashTable* table) {
 	table->bucket_list_free_function(table->_table);
 	table->size = 0;
 	table->entries = 0;
-	free(table->primes);
 	return TRUE;
 }

@@ -11,7 +11,6 @@ typedef struct hash_table {
 	HashNode** _table;
 	int size;
 	int entries;
-	BOOL* primes;
 	void*(*bucket_list_allocating_function)(int);
 	void(*bucket_list_free_function)(HashNode**);
 	BOOL(*key_comparer_function)(void*, void*);
