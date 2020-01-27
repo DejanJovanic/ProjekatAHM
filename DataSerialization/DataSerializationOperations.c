@@ -6,7 +6,7 @@ void Serialize(pak* head, zpak**serializedData, int n) {
 	*serializedData = (zpak*)malloc(sizeof(zpak) * n);
 
 	for (int i = 0; i < n; i++) {
-		(*serializedData)[i].num = head->num;
+		(*serializedData)[i].data = head->data;
 		head = head->next;
 	}
 }
@@ -16,7 +16,7 @@ void Deserialize(pak** head, pak**tail, char* niz, int brojBajtova) {
 
 	for (int i = 0; i < (brojBajtova / (int)sizeof(zpak)); i++) {
 		pak *p = (pak*)malloc(sizeof(pak));
-		p->num = nizPaketa[i].num;
+		p->data = nizPaketa[i].data;
 		p->next = NULL;
 
 		if (*head == NULL) {

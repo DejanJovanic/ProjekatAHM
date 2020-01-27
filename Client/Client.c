@@ -18,7 +18,7 @@
 void AddToList(pak** head, pak** tail, int num, struct Packet* next) {
 
 	pak *p = (pak*)malloc(sizeof(pak));
-	p->num = num;
+	p->data = num;
 	p->next = NULL;
 
 	if (*head == NULL) {
@@ -33,7 +33,7 @@ void AddToList(pak** head, pak** tail, int num, struct Packet* next) {
 void PrintList(pak* head) {
 
 	while (head != NULL) {
-		printf("%d\t", head->num);
+		printf("%d\t", head->data);
 		head = head->next;
 	}
 

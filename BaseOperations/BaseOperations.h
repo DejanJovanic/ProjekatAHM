@@ -5,4 +5,5 @@
 
 BOOL InitializeWindowsSockets();
 void CustomSelect(SOCKET s, char operation);
-void CustomRecieve(SOCKET s, char** niz, int* brojBajta);
+void CustomSend(SOCKET s, char* niz, int brojBajtova);
+int CustomRecieve(SOCKET s, char** niz);
