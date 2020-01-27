@@ -68,7 +68,7 @@ DWORD WINAPI Test20(LPVOID lpParam) {
 	void* items[10000];
 
 	for (int i = 0; i < 10000; i++) {
-		items[i] = thread_malloc(40000);
+		items[i] = thread_malloc(20000);
 	}
 
 	for (int i = 0; i < 10000; i++) {

@@ -1,5 +1,58 @@
 #include "HashTable.h"
 
+
+/* This function calculates (ab)%c */
+int _HashTable_modulo(int a, int b, int c) {
+	long long x = 1, y = a; // long long is taken to avoid overflow of intermediate results
+	while (b > 0) {
+		if (b % 2 == 1) {
+			x = (x * y) % c;
+		}
+		y = (y * y) % c; // squaring the base
+		b /= 2;
+	}
+	return x % c;
+}
+
+/* this function calculates (a*b)%c taking into account that a*b might overflow */
+long long _HashTable_mulmod(long long a, long long b, long long c) {
+	long long x = 0, y = a % c;
+	while (b > 0) {
+		if (b % 2 == 1) {
+			x = (x + y) % c;
+		}
+		y = (y * 2) % c;
+		b /= 2;
+	}
+	return x % c;
+}
+
+/* Miller-Rabin primality test, iteration signifies the accuracy of the test */
+BOOL _HashTable_miller_rabin(long long p, int iteration) {
+	if (p < 2) {
+		return FALSE;
+	}
+	if (p != 2 && p % 2 == 0) {
+		return FALSE;
+	}
+	long long s = p - 1;
+	while (s % 2 == 0) {
+		s /= 2;
+	}
+	for (int i = 0; i < iteration; i++) {
+		long long a = rand() % (p - 1) + 1, temp = s;
+		long long mod = _HashTable_modulo(a, temp, p);
+		while (temp != p - 1 && mod != 1 && mod != p - 1) {
+			mod = _HashTable_mulmod(mod, mod, p);
+			temp *= 2;
+		}
+		if (mod != p - 1 && temp % 2 == 0) {
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
 inline uint32_t _HashTable_get_hash(void* key) {
 	uintptr_t a = (uintptr_t)key;
 	a -= (a << 6);
@@ -26,9 +79,7 @@ BOOL HashTable_initialize_table(HashTable* table, unsigned int buckets, BOOL(*ke
 		table->size = buckets;
 		for (int i = 0; i < buckets; i++)
 			table->_table[i] = NULL;
-
 	}
-		
 	else
 		ret = FALSE;
 
@@ -48,14 +99,28 @@ HashNode* HashTable_get(HashTable* table, void* key) {
 	return node;
 }
 
-void HashTable_rebuild_table(HashTable* table) {
+void _HashTable_rebuild_table(HashTable* table) {
 	HashNode** old_table, * next, * current;
 	unsigned int old_size, index, i;
 
 	old_table = table->_table;
 	old_size = table->size;
-	table->_table = table->bucket_list_allocating_function(old_size * 2);
-	table->size <<= 1;
+	int new_size = old_size << 1;
+	if (new_size % 2 == 0)
+		new_size++;
+	for (; new_size < 4 * old_size; new_size += 2)
+		if (_HashTable_miller_rabin(new_size, 20))
+			break;
+	//if (new_size <= 1000000){
+	//	while (TRUE) {
+	//		if (table->primes[new_size])
+	//			break;
+	//			new_size++;
+	//	}
+	//}
+
+	table->size = new_size;
+	table->_table = table->bucket_list_allocating_function(table->size);
 	for (int i = 0; i < table->size; i++) {
 		table->_table[i] = NULL;
 	}
@@ -76,7 +141,7 @@ void HashTable_rebuild_table(HashTable* table) {
 BOOL HashTable_insert(HashTable* table, void* key, void* value) {
 	if (HashTable_get(table, key) == NULL) {
 		while (table->entries >= table->size * 0.75)
-			HashTable_rebuild_table(table);
+			_HashTable_rebuild_table(table);
 		uint32_t index = _HashTable_get_hash(key) % table->size;
 		HashNode* node = (HashNode*)table->node_allocate_function();
 		node->key = key;
