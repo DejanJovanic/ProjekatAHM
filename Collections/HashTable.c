@@ -53,6 +53,8 @@ BOOL _HashTable_miller_rabin(long long p, int iteration) {
 	return TRUE;
 }
 
+/// Hash algoritam koji odredjuje hash uz pomoc multiplikacije i siftovanja.
+/// Algoritam preuzet sa: http://burtleburtle.net/bob/hash/integer.html
 inline uint32_t _HashTable_get_hash(void* key) {
 	uintptr_t a = (uintptr_t)key;
 	a -= (a << 6);
@@ -62,24 +64,59 @@ inline uint32_t _HashTable_get_hash(void* key) {
 	a -= (a << 3);
 	a ^= (a << 10);
 	a ^= (a >> 15);
-	return a >> ((sizeof(uintptr_t) - sizeof(uint32_t)) * 8);
+	/// u slucaju 64-bitnih adresa, siftuju se najznacajniji biti (koji su najvazniji), kako bi se dobio 32-bitni broj.
+	return a >> ((sizeof(uintptr_t) - sizeof(uint32_t)) * 8); 
 }
 
-BOOL HashTable_initialize_table(HashTable* table, unsigned int buckets, BOOL(*key_comparer)(void*, void*), void* (*bucket_list_allocating_function)(int), void(*bucket_list_free_function)(HashNode**), void* (*node_allocate_function)(), void(*node_free_function)(HashNode*)) {
+BOOL HashTable_initialize_table(HashTable* table, unsigned int minimal_size, void* (*bucket_list_allocating_function)(int), void(*bucket_list_free_function)(HashNode**), void* (*node_allocate_function)(), void(*node_free_function)(HashNode*)) {
 	BOOL ret = TRUE;
+
 	table->entries = 0;
-	table->key_comparer_function = key_comparer;
-	table->bucket_list_allocating_function = bucket_list_allocating_function;
-	table->bucket_list_free_function = bucket_list_free_function;
-	table->node_allocate_function = node_allocate_function;
-	table->node_free_function = node_free_function;
-	if(buckets > 0 && key_comparer != NULL)
-		table->_table = table->bucket_list_allocating_function(buckets);
-	if (table->_table != NULL) {
-		table->size = buckets;
-		for (int i = 0; i < buckets; i++)
-			table->_table[i] = NULL;
+
+	/// Osiguraj da prosledjeni parametri nisu NULL
+	if (table == NULL)
+		return FALSE;
+
+	if (bucket_list_allocating_function != NULL)
+		table->bucket_list_allocating_function = bucket_list_allocating_function;
+	else
+		return FALSE;
+
+	if (bucket_list_free_function != NULL)
+		table->bucket_list_free_function = bucket_list_free_function;
+	else
+		return FALSE;
+
+	if (node_allocate_function != NULL)
+		table->node_allocate_function = node_allocate_function;
+	else
+		return FALSE;
+
+	if (node_free_function != NULL)
+		table->node_free_function = node_free_function;
+	else
+		return FALSE;
+
+	/// Osiguraj da je minimalna velicina tabele prost broj
+	if (minimal_size > 0) {
+		int size = minimal_size;
+		if (size % 2 == 0)
+			size++;
+
+		for (; size < 2 * size; size += 2)
+			if (_HashTable_miller_rabin(size, 20))
+				break;
+		table->size = size;
 	}
+	else
+		table->size = 1009;
+
+	table->minimal_size = table->size;
+	// alociraj tabelu i inicijalizuj je sa NULL pokazivacima
+	table->_table = table->bucket_list_allocating_function(table->size);
+	if (table->_table != NULL) 
+		for (int i = 0; i < minimal_size; i++)
+			table->_table[i] = NULL;
 	else
 		ret = FALSE;
 
@@ -87,16 +124,19 @@ BOOL HashTable_initialize_table(HashTable* table, unsigned int buckets, BOOL(*ke
 }
 
 HashNode* HashTable_get(HashTable* table, void* key) {
-	uint32_t hash = _HashTable_get_hash(key);
-	uint32_t index = hash % table->size;
-	HashNode* node;
-	uintptr_t pointer_value = (uintptr_t)key;
-	for (node = table->_table[index]; node != NULL; node = node->next) {
-		if (table->key_comparer_function(key,node->key))
-			break;
-	}
+	if (table != NULL && key != NULL && table->_table != NULL) {
+		uint32_t index = _HashTable_get_hash(key) % table->size;
+		uintptr_t pointer_value = (uintptr_t)key;
 
-	return node;
+		/// iteriraj kroz bucket u kojem se nalazi element, i u slucaju pronalaska vrati pokazivac na element.
+		for (HashNode* node = table->_table[index]; node != NULL; node = node->next) {
+			if (node->key == pointer_value)
+				return node;
+		}
+	}
+	else
+		return NULL;
+
 }
 
 void _HashTable_rebuild_table(HashTable* table) {
@@ -111,13 +151,6 @@ void _HashTable_rebuild_table(HashTable* table) {
 	for (; new_size < 4 * old_size; new_size += 2)
 		if (_HashTable_miller_rabin(new_size, 20))
 			break;
-	//if (new_size <= 1000000){
-	//	while (TRUE) {
-	//		if (table->primes[new_size])
-	//			break;
-	//			new_size++;
-	//	}
-	//}
 
 	table->size = new_size;
 	table->_table = table->bucket_list_allocating_function(table->size);
@@ -139,63 +172,86 @@ void _HashTable_rebuild_table(HashTable* table) {
 }
 
 BOOL HashTable_insert(HashTable* table, void* key, void* value) {
-	if (HashTable_get(table, key) == NULL) {
-		while (table->entries >= table->size * 0.75)
-			_HashTable_rebuild_table(table);
-		uint32_t index = _HashTable_get_hash(key) % table->size;
-		HashNode* node = (HashNode*)table->node_allocate_function();
-		node->key = key;
-		node->value = value;
-		node->next = table->_table[index];
-		table->_table[index] = node;
-		table->entries++;
-		return TRUE;
+	if (table != NULL && key != NULL) {
+		/// u slucaju da tabela vec sadrzi element sa datim kljucem, operacija vraca FALSE
+		if (HashTable_get(table, key) == NULL) {
+
+			if (table->entries >= table->size * 0.75) ///< u slucaju da je tabela popunjena vise od 75%, zbog performansa joj je potrebno duplo povecati velicinu.
+				_HashTable_rebuild_table(table);
+
+			uint32_t index = _HashTable_get_hash(key) % table->size;
+
+			HashNode* node = (HashNode*)table->node_allocate_function();
+			/// alociranom elementu dodeli vrednosti
+			node->key = key;
+			node->value = value;
+			node->next = table->_table[index];
+
+			if (table->_table != NULL) {
+				table->_table[index] = node; ///< alociran element ubaci u tabelu
+				table->entries++;
+			}
+
+			return TRUE;
+		}
+		else
+			return FALSE;
 	}
 	else
 		return FALSE;
+
 }
 
 
 BOOL HashTable_delete(HashTable* table, void* key,void** out_value) {
-	HashNode* node;
-	HashNode* last;
+	if (table != NULL && key != NULL && table->_table != NULL) {
+		HashNode* node = HashTable_get(table, key); ///< dobavi element sa datim kljucem
 
-	node = HashTable_get(table, key);
-	uint32_t index = _HashTable_get_hash(key) % table->size;
-	if (node != NULL) {
-		if (node == table->_table[index]) {
-			table->_table[index] = node->next;
-		}
-		else {
-			for (last = table->_table[index]; last != NULL && last->next != NULL; last = last->next) {
-				if (last->next == node)
-					break;
+		if (node != NULL) {
+			uint32_t index = _HashTable_get_hash(key) % table->size; ///< uz pomoc hash funkcije izracunaj index "bucket-a" elementa.
+			if (node == table->_table[index]) {
+				table->_table[index] = node->next;
+			}
+			else {
+				HashNode* last;
+				/// pronadji element koji se nalazi pre elementa za brisanje,
+				for (last = table->_table[index]; last != NULL && last->next != NULL; last = last->next) 
+					if (last->next == node)
+						break;
+				
+				last->next = node->next; ///< izbaci element za brisanje iz tabele.
 			}
 
-			last->next = node->next;
+			table->entries--;
+			*out_value = node->value;
+			table->node_free_function(node);
+			return TRUE;
 		}
-		table->entries--;
-		*out_value = node->value;
-		table->node_free_function(node);
-		return TRUE;
+		else
+			return FALSE;
 	}
 	else
 		return FALSE;
 }
 
 BOOL HashTable_deinitialize_table(HashTable* table) {
-	HashNode* current = NULL;
-	HashNode* next = NULL;
-	for (int i = 0; i < table->size; i++) {
-		current = table->_table[i];
-		while (current != NULL) {
-			next = current->next;
-			table->node_free_function(current);
-			current = next;
+	if (table != NULL) {
+		HashNode* current = NULL;
+		HashNode* next = NULL;
+		/// prolazak kroz tabelu i oslobadjanje svih ulancanih elemenata.
+		for (int i = 0; i < table->size; i++) {
+			current = table->_table[i];
+			while (current != NULL) {
+				next = current->next;
+				table->node_free_function(current);
+				current = next;
+			}
 		}
+		table->bucket_list_free_function(table->_table); ///< oslobadjanje same tabele.
+		table->size = 0;
+		table->entries = 0;
+		return TRUE;
 	}
-	table->bucket_list_free_function(table->_table);
-	table->size = 0;
-	table->entries = 0;
-	return TRUE;
+	else
+		return FALSE;
 }

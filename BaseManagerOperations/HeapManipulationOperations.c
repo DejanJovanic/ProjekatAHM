@@ -1,21 +1,20 @@
 #include "HeapManipulationOperations.h"
 
-BOOL HeapManipulationOperations_get_heap(HeapManager* manager, Heap* heap) {
-	if (manager->heap_count > 0) {
-		int current = 0;
+BOOL HeapManipulationOperations_get_heap(HeapManager* manager, Heap* out_heap) {
+	BOOL ret = FALSE;
+
+	if (manager != NULL && manager->heap_count > 0) {
 		Heap temp;
 		EnterCriticalSection(&manager->manager_mutex);
 		temp = manager->heap_array[manager->current_heap];
-		manager->current_heap = (manager->current_heap + 1) % manager->heap_count;
+		manager->current_heap = (manager->current_heap + 1) % manager->heap_count; ///< Round robin tehnika.
 		LeaveCriticalSection(&manager->manager_mutex);
 		if (temp != NULL) {
-			*heap = temp;
-			return TRUE;
+			*out_heap = temp;
+			ret = TRUE;
 		}
-		else
-			return FALSE;
 	}
-	else
-		return FALSE;
+
+	return ret;
 
 }
