@@ -12,7 +12,7 @@ BOOL InitializeWindowsSockets()
 	return TRUE;
 }
 
-void CustomSelect(SOCKET s, char operation) {
+void Base_custom_select(SOCKET s, char operation) {
 	if (operation == 'r') {
 		//ovo je citanje
 		do {
@@ -56,15 +56,15 @@ void CustomSelect(SOCKET s, char operation) {
 
 }
 
-void CustomSend(SOCKET s, char* niz, int broj_bajtova) {
+void Base_custom_send(SOCKET s, char* niz, int broj_bajtova) {
 	int iResult = 0;
 	int poslato_bajtova = 0;
 	
-	CustomSelect(s, 'w');
+	Base_custom_select(s, 'w');
 	iResult = send(s, (char*)&broj_bajtova, 4, NULL);
 
 	do {
-		CustomSelect(s, 'w');
+		Base_custom_select(s, 'w');
 		iResult = send(s, niz + poslato_bajtova, broj_bajtova - poslato_bajtova, NULL);
 
 		if (iResult == 0) {
@@ -86,14 +86,14 @@ void CustomSend(SOCKET s, char* niz, int broj_bajtova) {
 	return;
 }
 
-int CustomRecieve(SOCKET s, char** niz) {
+int Base_custom_recieve(SOCKET s, char** niz) {
 
 	int iResult = 0;
 	int bytesRecieved = 0;
 
 	char* buff = (char *)malloc(4 * sizeof(char));
 	//u niz smestamo 4bajtni broj koji nam govori kolika je kolicina podataka koju treba da primimo kroz mrezu
-	CustomSelect(s, 1);
+	Base_custom_select(s, 'r');
 	iResult = recv(s, buff, 4, NULL);
 
 	//pocetnu adresu prihvatnog bafera kastujem na int* (4 bajta) i dereferenciram kako bih dobio kolicinu podatka
@@ -103,7 +103,7 @@ int CustomRecieve(SOCKET s, char** niz) {
 
 
 	do {
-		CustomSelect(s, 'r');
+		Base_custom_select(s, 'r');
 		iResult = recv(s, *niz + bytesRecieved, brojBajta - bytesRecieved, NULL);
 
 		if (iResult == 0) {
