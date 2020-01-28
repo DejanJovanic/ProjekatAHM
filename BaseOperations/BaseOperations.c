@@ -1,10 +1,10 @@
 #include "BaseOperations.h"
 
-BOOL InitializeWindowsSockets()
+BOOL Base_initialize_windows_sockets()
 {
-	WSADATA wsaData;
-	// Initialize windows sockets library for this process
-	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+	WSADATA wsa_data;
+	
+	if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
 	{
 		printf("WSAStartup failed with error: %d\n", WSAGetLastError());
 		return FALSE;
@@ -17,14 +17,14 @@ void Base_custom_select(SOCKET s, char operation) {
 		//ovo je citanje
 		do {
 			FD_SET set;
-			TIMEVAL timeVal;
+			TIMEVAL time_val;
 			FD_ZERO(&set);
 			FD_SET(s, &set);
-			timeVal.tv_sec = 1;
-			timeVal.tv_usec = 0;
-			int iResult = select(0 /* ignored */, &set, NULL, NULL, &timeVal);
+			time_val.tv_sec = 1;
+			time_val.tv_usec = 0;
+			int result = select(0 /* ignored */, &set, NULL, NULL, &time_val);
 
-			if (iResult > 0)
+			if (result > 0)
 			{
 				//Sleep(200);
 				break;
@@ -36,15 +36,15 @@ void Base_custom_select(SOCKET s, char operation) {
 		//ovo je pisanje
 		do {
 			FD_SET set;
-			TIMEVAL timeVal;
+			TIMEVAL time_val;
 			FD_ZERO(&set);
 			FD_SET(s, &set);
-			timeVal.tv_sec = 1;
-			timeVal.tv_usec = 0;
+			time_val.tv_sec = 1;
+			time_val.tv_usec = 0;
 
-			int iResult = select(0 /* ignored */, NULL, &set, NULL, &timeVal);
+			int result = select(0 /* ignored */, NULL, &set, NULL, &time_val);
 
-			if (iResult > 0)
+			if (result > 0)
 			{
 				break;
 			}
@@ -57,66 +57,60 @@ void Base_custom_select(SOCKET s, char operation) {
 }
 
 void Base_custom_send(SOCKET s, char* niz, int broj_bajtova) {
-	int iResult = 0;
-	int poslato_bajtova = 0;
+	int result = 0;
+	int bytes_sent = 0;
 	
 	Base_custom_select(s, 'w');
-	iResult = send(s, (char*)&broj_bajtova, 4, NULL);
+	result = send(s, (char*)&broj_bajtova, 4, NULL);
 
 	do {
 		Base_custom_select(s, 'w');
-		iResult = send(s, niz + poslato_bajtova, broj_bajtova - poslato_bajtova, NULL);
+		result = send(s, niz + bytes_sent, broj_bajtova - bytes_sent, NULL);
 
-		if (iResult == 0) {
+		if (result == 0) {
 
 			continue;
 		}
-		else if (iResult == -1) {
+		else if (result == -1) {
 			printf("\nGreska!\n");
 			return;
 		}
 
-		poslato_bajtova += iResult;
+		bytes_sent += result;
 
-	} while (poslato_bajtova < broj_bajtova);
-
-	//printf("Poslao sam\n");
-	//getc(stdin);
-
-	//return;
+	} while (bytes_sent < broj_bajtova);
 }
 
 int Base_custom_recieve(SOCKET s, char** niz) {
 
-	int iResult = 0;
-	int bytesRecieved = 0;
+	int result = 0;
+	int bytes_recieved = 0;
 
 	char* buff = (char *)malloc(4 * sizeof(char));
 	//u niz smestamo 4bajtni broj koji nam govori kolika je kolicina podataka koju treba da primimo kroz mrezu
 	Base_custom_select(s, 'r');
-	iResult = recv(s, buff, 4, NULL);
+	result = recv(s, buff, 4, NULL);
 
 	//pocetnu adresu prihvatnog bafera kastujem na int* (4 bajta) i dereferenciram kako bih dobio kolicinu podatka
-	int brojBajta = *((int*)buff);
+	int bytes_to_recieve = *((int*)buff);
 	free(buff);
-	*niz = (char*)malloc(brojBajta);
-
+	*niz = (char*)malloc(bytes_to_recieve);
 
 	do {
 		Base_custom_select(s, 'r');
-		iResult = recv(s, *niz + bytesRecieved, brojBajta - bytesRecieved, NULL);
+		result = recv(s, *niz + bytes_recieved, bytes_to_recieve - bytes_recieved, NULL);
 
-		if (iResult == 0) {
+		if (result == 0) {
 			continue;
 		}
-		else if (iResult == -1) {
+		else if (result == -1) {
 			printf("\nGreska!\n");
 			break;
 		}
 
-		bytesRecieved += iResult;
+		bytes_recieved += result;
 
-	} while (bytesRecieved < brojBajta);
+	} while (bytes_recieved < bytes_to_recieve);
 
-	return brojBajta;
+	return bytes_to_recieve;
 }

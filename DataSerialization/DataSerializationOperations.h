@@ -1,5 +1,5 @@
 #pragma once
 #include "../DataCollections/List.h"
 
-void Serialize(pak*, zpak**, int);
-void Deserialize(pak**, pak**, char*, int);
+void Data_serialize(pak*, zpak**, int);
+void Data_deserialize(pak**, pak**, char*, int);

@@ -16,20 +16,20 @@
 
 #define DEFAULT_PORT "27016"
 #define CLIENTS_NO 10
-DWORD WINAPI listenThreadFunction(LPVOID lpParam);
+DWORD WINAPI listen_thread_function(LPVOID lpParam);
 
 int  main(void)
 {
-    SOCKET listenSocket = INVALID_SOCKET;
-    SOCKET acceptedSocket = INVALID_SOCKET;
-	int iResult;
+    SOCKET listen_socket = INVALID_SOCKET;
+    SOCKET accepted_socket = INVALID_SOCKET;
+	int result;
 
-    if(InitializeWindowsSockets() == FALSE)
+    if(Base_initialize_windows_sockets() == FALSE)
     {
 		return 1;
     }
     
-	ADDRINFO *resultingAddress = NULL;
+	ADDRINFO *resulting_address = NULL;
 	ADDRINFO hints;
 
     memset(&hints, 0, sizeof(hints));
@@ -38,87 +38,87 @@ int  main(void)
     hints.ai_protocol = IPPROTO_TCP; // Use TCP protocol
     hints.ai_flags = AI_PASSIVE;     // 
 
-    iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &resultingAddress);
-    if ( iResult != 0 )
+	result = getaddrinfo(NULL, DEFAULT_PORT, &hints, &resulting_address);
+    if (result != 0 )
     {
-        printf("getaddrinfo failed with error: %d\n", iResult);
+        printf("getaddrinfo failed with error: %d\n", result);
         WSACleanup();
         return 1;
     }
 
-    listenSocket = socket(AF_INET,      // IPv4 address famly
+	listen_socket = socket(AF_INET,      // IPv4 address famly
                           SOCK_STREAM,  // stream socket
                           IPPROTO_TCP); // TCP
 
-    if (listenSocket == INVALID_SOCKET)
+    if (listen_socket == INVALID_SOCKET)
     {
         printf("socket failed with error: %ld\n", WSAGetLastError());
-        freeaddrinfo(resultingAddress);
+        freeaddrinfo(resulting_address);
         WSACleanup();
         return 1;
     }
 
-    iResult = bind( listenSocket, resultingAddress->ai_addr, (int)resultingAddress->ai_addrlen);
-    if (iResult == SOCKET_ERROR)
+	result = bind(listen_socket, resulting_address->ai_addr, (int)resulting_address->ai_addrlen);
+    if (result == SOCKET_ERROR)
     {
         printf("bind failed with error: %d\n", WSAGetLastError());
-        freeaddrinfo(resultingAddress);
-        closesocket(listenSocket);
+        freeaddrinfo(resulting_address);
+        closesocket(listen_socket);
         WSACleanup();
         return 1;
     }
 
-    freeaddrinfo(resultingAddress);
+    freeaddrinfo(resulting_address);
 
-    iResult = listen(listenSocket, SOMAXCONN);
-    if (iResult == SOCKET_ERROR)
+	result = listen(listen_socket, SOMAXCONN);
+    if (result == SOCKET_ERROR)
     {
         printf("listen failed with error: %d\n", WSAGetLastError());
-        closesocket(listenSocket);
+        closesocket(listen_socket);
         WSACleanup();
         return 1;
     }
 
 	printf("Server initialized, waiting for clients.\n");
 	DWORD id;
-	HANDLE listenThread = CreateThread(NULL, 0, &listenThreadFunction, &listenSocket, 0, &id);
+	HANDLE listen_thread = CreateThread(NULL, 0, &listen_thread_function, &listen_socket, 0, &id);
 	
 	printf("Press any key to stop server.\n\n");
 	getchar();
-	//getchar();
 	
+	CloseHandle(listen_thread);
 
-    iResult = shutdown(listenSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR)
+	result = shutdown(listen_socket, SD_SEND);
+    if (result == SOCKET_ERROR)
     {
         printf("shutdown failed with error: %d\n", WSAGetLastError());
-        closesocket(acceptedSocket);
+        closesocket(accepted_socket);
         WSACleanup();
         return 1;
     }
 
-    closesocket(listenSocket);
-    closesocket(acceptedSocket);
+    closesocket(listen_socket);
+    closesocket(accepted_socket);
     WSACleanup();
 
     return 0;
 }
 
-DWORD WINAPI listenThreadFunction(LPVOID lpParam)
+DWORD WINAPI listen_thread_function(LPVOID param)
 {
 
 	char* message;
 	int length = 0;
-	SOCKET listenSocket = *((SOCKET*)(lpParam));
+	SOCKET listen_socket = *((SOCKET*)(param));
 	unsigned long mode = 1;
-	int iResult = ioctlsocket(listenSocket, FIONBIO, &mode);
-	if (iResult != NO_ERROR)
+	int result = ioctlsocket(listen_socket, FIONBIO, &mode);
+	if (result != NO_ERROR)
 	{
-		printf("ioctlsocket za listen failed with error: %ld\n", iResult);
+		printf("ioctlsocket za listen failed with error: %ld\n", result);
 	}
-	iResult = listen(listenSocket, SOMAXCONN);
+	result = listen(listen_socket, SOMAXCONN);
 
-	SOCKET clientSockets[CLIENTS_NO];
+	SOCKET client_sockets[CLIENTS_NO];
 
 	int counter = 0;
 
@@ -126,40 +126,40 @@ DWORD WINAPI listenThreadFunction(LPVOID lpParam)
 	{
 		if (counter != CLIENTS_NO)
 		{
-			Base_custom_select(listenSocket, 'r');
+			Base_custom_select(listen_socket, 'r');
 		}
 		else
 			return 0;
 
-		struct sockaddr_in clientAddr;
-		int clientAddrSize = sizeof(struct sockaddr_in);
-		clientSockets[counter] = accept(listenSocket, (struct sockaddr *)&clientAddr, &clientAddrSize);
+		struct sockaddr_in client_addr;
+		int client_addr_size = sizeof(struct sockaddr_in);
+		client_sockets[counter] = accept(listen_socket, (struct sockaddr *)&client_addr, &client_addr_size);
 
-		if (clientSockets[counter] == INVALID_SOCKET)
+		if (client_sockets[counter] == INVALID_SOCKET)
 		{
 			printf("accept failed with error: %d\n", WSAGetLastError());
-			closesocket(listenSocket);
+			closesocket(listen_socket);
 			WSACleanup();
 			return 1;
 		}
 		else
 		{
-			if (ioctlsocket(clientSockets[counter], FIONBIO, &mode) != 0)
+			if (ioctlsocket(client_sockets[counter], FIONBIO, &mode) != 0)
 			{
 				printf("ioctlsocket failed with error.");
 				continue;
 			}
-			printf("New client request accepted (%d). Client address: %s : %d\n", counter, inet_ntoa(clientAddr.sin_addr), ntohs(clientAddr.sin_port));
+			printf("New client request accepted (%d). Client address: %s : %d\n", counter, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 			
-			Base_custom_select(clientSockets[counter], 'r');
-			Base_custom_recieve(clientSockets[counter], &message);
+			Base_custom_select(client_sockets[counter], 'r');
+			Base_custom_recieve(client_sockets[counter], &message);
 			printf("Primio od klijenta: %s\n", message);
 			free(message);
 			//counter++;
 			//vracanje poruke nasumicne duzine
-			length = Data_generate_message(&message, counter+10);
-			Base_custom_select(clientSockets[counter], 'w');
-			Base_custom_send(clientSockets[counter], message, length);
+			length = Data_generate_message(&message, counter + 10);
+			Base_custom_select(client_sockets[counter], 'w');
+			Base_custom_send(client_sockets[counter], message, length);
 			printf("Saljem na klijenta: %s\n\n", message);
 			free(message);
 			counter++;

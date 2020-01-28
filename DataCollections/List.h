@@ -1,14 +1,28 @@
 #pragma once
 #include <stdlib.h>
+#include <stdio.h>
 #include "Windows.h"
 
+/**
+*	Paket() - Struktura podataka koja se koristi za listu
+*
+*	next: pokazivac na sledeci element liste
+*	size: duzina niza karaktera
+*	data: niz karaktera
+**/
 typedef struct Paket {
 	struct Paket* next;
 	int size;
 	char *data;
 }pak;
 
-typedef struct ZipPaket {
+/**
+*	Zip_paket() - Struktura podataka koja se koristi za serijalizovanu listu koja se salje kroz mrezu (bez pokazivaca)
+*
+*	size: duzina niza karaktera
+*	data: niz karaktera
+**/
+typedef struct Zip_paket {
 	int size;
 	char *data;
 }zpak;
