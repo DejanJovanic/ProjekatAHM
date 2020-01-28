@@ -1,22 +1,30 @@
-#include "Thread1Test.h"
-#include "Thread2Test.h"
-#include "Thread5Test.h"
-#include "Thread10Test.h"
-#include "Thread20Test.h"
-#include "Thread50Test.h"
+#include "ThreadTests.h"
 
-int main() {
+int main(int argc, char* argv[]) 
+{
+	if (argc != 2)
+	{
+		printf("Ne postoje argumenti komandne linije\n");
+		return 0;
+	}
+
+	ManagerInitialization_initialize_manager(atoi(argv[1]));
+	ThreadTests_initialize_test(1); 
 	
+	ThreadTests_initialize_test(2);
+	
+	//ThreadTests_initialize_test(5);
+	
+	//ThreadTests_initialize_test(10);
+	
+	//ThreadTests_initialize_test(20);
+	
+	//ThreadTests_initialize_test(50);
+	ManagerInitialization_destroy_manager();
 
-	StartTest1();
-	//a = getchar();
-	StartTest2();
-	//a = getchar();
-	StartTest5();
-	//a = getchar();
-	StartTest10();
-	StartTest20();
-	StartTest50();
+	printf("\nPritisnite bilo sta za izlazak iz programa...\n");
 	getchar();
+
+
 	return 0;
 }

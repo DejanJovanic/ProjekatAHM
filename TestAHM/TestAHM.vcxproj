@@ -19,21 +19,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Thread10Test.h" />
-    <ClInclude Include="Thread1Test.h" />
-    <ClInclude Include="Thread20Test.h" />
-    <ClInclude Include="Thread2Test.h" />
-    <ClInclude Include="Thread50Test.h" />
-    <ClInclude Include="Thread5Test.h" />
+    <ClInclude Include="ThreadTests.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="StartTest.c" />
-    <ClCompile Include="Thread10Test.c" />
-    <ClCompile Include="Thread1Test.c" />
-    <ClCompile Include="Thread20Test.c" />
-    <ClCompile Include="Thread2Test.c" />
-    <ClCompile Include="Thread50Test.c" />
-    <ClCompile Include="Thread5Test.c" />
+    <ClCompile Include="ThreadTests.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Manager\Manager.vcxproj">

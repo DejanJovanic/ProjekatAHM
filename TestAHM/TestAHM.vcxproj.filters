@@ -15,46 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Thread1Test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Thread2Test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Thread5Test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Thread10Test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Thread20Test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Thread50Test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Thread1Test.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Thread2Test.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Thread5Test.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Thread20Test.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Thread50Test.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Thread10Test.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="StartTest.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ThreadTests.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ThreadTests.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
