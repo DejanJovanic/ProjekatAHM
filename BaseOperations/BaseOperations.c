@@ -80,10 +80,10 @@ void Base_custom_send(SOCKET s, char* niz, int broj_bajtova) {
 
 	} while (poslato_bajtova < broj_bajtova);
 
-	printf("pposlao sam\n");
-	getc(stdin);
+	//printf("Poslao sam\n");
+	//getc(stdin);
 
-	return;
+	//return;
 }
 
 int Base_custom_recieve(SOCKET s, char** niz) {
