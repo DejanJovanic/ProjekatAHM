@@ -3,7 +3,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-BOOL InitializeWindowsSockets();
+/**
+*	Base_initialize_windows_sockets() - Inicijalizuje windows sokete za tekuci proces, vraca TRUE ako se izvrsi uspesno, u suprotnom FALSE
+**/
+BOOL Base_initialize_windows_sockets();
 /**
 *	Base_custom_select() - Osluskuje da li je moguce slanje ili primanje podataka
 *

@@ -17,28 +17,23 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-
 #define SERVER_IP_ADDRESS "127.0.0.1"
 #define SERVER_PORT 27016
 #define CLIENTS_NO 10
-//HANDLE hSemaphores[CLIENTS_NO];
-DWORD WINAPI clientThread(LPVOID lpParam);
+
+
+DWORD WINAPI client_thread(LPVOID lpParam);
 CRITICAL_SECTION cs;
+
 
 int main()
 {
 
-	if (InitializeWindowsSockets() == FALSE)
+	if (Base_initialize_windows_sockets() == FALSE)
 	{
 		return 1;
 	}
 
-
-	/*for (int i = 0; i < CLIENTS_NO; i++)
-	{
-		
-			hSemaphores[i] = CreateSemaphore(0, 0, 1, NULL);
-	}*/
 	InitializeCriticalSection(&cs);
 	DWORD ids[CLIENTS_NO];
 	HANDLE threads[CLIENTS_NO];
@@ -46,102 +41,90 @@ int main()
 
 	for (int i = 0; i < CLIENTS_NO; i++)
 	{
-		threads[i] = CreateThread(NULL, 0, &clientThread, (LPVOID)i, 0, &ids[i]);
-		//WaitForSingleObject(hSemaphores[i], INFINITE);
+		threads[i] = CreateThread(NULL, 0, &client_thread, (LPVOID)i, 0, &ids[i]);
 	}
 
-
 	getchar();
-	/*for (int i = 0; i < CLIENTS_NO; i++)
-	{
-		CloseHandle(hSemaphores[i]);
-	}*/
+
 	for (int i = 0; i < CLIENTS_NO; i++)
 	{
 		CloseHandle(threads[i]);
 	}
 	DeleteCriticalSection(&cs);
 
-	
-	// Deinitialize WSA library
 	WSACleanup();
 	
 	return 0;
 
-
 }
 
-DWORD WINAPI clientThread(LPVOID lpParam)
+DWORD WINAPI client_thread(LPVOID param)
 {
 	EnterCriticalSection(&cs);
 	
-	int n = (int)lpParam;
-	if (InitializeWindowsSockets() == FALSE)
+	int n = (int)param;
+	if (Base_initialize_windows_sockets() == FALSE)
 	{
 		return 1;
 	}
 	
-
 	printf("\nClient NO: %d\n", n);
-	
-	
-	SOCKET connectSocket = INVALID_SOCKET;
-	int iResult;
+		
+	SOCKET connect_socket = INVALID_SOCKET;
+	int result;
 	char* message;
 	int length = 0;
 
-	connectSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	connect_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	if (connectSocket == INVALID_SOCKET)
+	if (connect_socket == INVALID_SOCKET)
 	{
 		printf("socket failed with error: %ld\n", WSAGetLastError());
 		WSACleanup();
 		return 1;
 	}
-	struct sockaddr_in serverAddress;
+	struct sockaddr_in server_address;
 	
 
-	serverAddress.sin_family = AF_INET;								// IPv4 protocol
-	serverAddress.sin_addr.s_addr = inet_addr(SERVER_IP_ADDRESS);	// ip address of server
-	serverAddress.sin_port = htons(SERVER_PORT);
+	server_address.sin_family = AF_INET;							// IPv4 protocol
+	server_address.sin_addr.s_addr = inet_addr(SERVER_IP_ADDRESS);	// ip address of server
+	server_address.sin_port = htons(SERVER_PORT);
 
-	if (connect(connectSocket, (SOCKADDR*)&serverAddress, sizeof(serverAddress)) == SOCKET_ERROR)
+	if (connect(connect_socket, (SOCKADDR*)&server_address, sizeof(server_address)) == SOCKET_ERROR)
 	{
 		printf("Unable to connect to server.\n");
-		closesocket(connectSocket);
+		closesocket(connect_socket);
 		WSACleanup();
 	}
 
-	unsigned long int nonBlockingMode = 1;
-	iResult = ioctlsocket(connectSocket, FIONBIO, &nonBlockingMode);
-
-	
+	unsigned long int non_blocking_mode = 1;
+	result = ioctlsocket(connect_socket, FIONBIO, &non_blocking_mode);
 
 	length = Data_generate_message(&message, n+20);
-	Base_custom_select(connectSocket, 'w');
-	Base_custom_send(connectSocket, message, length);
+	Base_custom_select(connect_socket, 'w');
+	Base_custom_send(connect_socket, message, length);
 	printf("Saljem na server: %s\n", message);
 	free(message);
 	
-	Base_custom_select(connectSocket, 'r');
-	length = Base_custom_recieve(connectSocket, &message);
+	Base_custom_select(connect_socket, 'r');
+	length = Base_custom_recieve(connect_socket, &message);
 	
 	printf("Primio od servera: %s\n", message);
 	
 	free(message);
 	//LeaveCriticalSection(&cs);
-	iResult = shutdown(connectSocket, SD_BOTH);
+	result = shutdown(connect_socket, SD_BOTH);
 
 	// Check if connection is succesfully shut down.
-	if (iResult == SOCKET_ERROR)
+	if (result == SOCKET_ERROR)
 	{
 		printf("Shutdown failed with error: %d\n", WSAGetLastError());
-		closesocket(connectSocket);
+		closesocket(connect_socket);
 		WSACleanup();
 		return 1;
 	}
 
-	closesocket(connectSocket);
+	closesocket(connect_socket);
 	LeaveCriticalSection(&cs);
 	//ReleaseSemaphore(hSemaphores[(n + 1) % CLIENTS_NO-1], 1, NULL);
 	return 0;
