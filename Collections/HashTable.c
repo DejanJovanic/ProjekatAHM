@@ -27,7 +27,7 @@ long long _HashTable_mulmod(long long a, long long b, long long c) {
 	return x % c;
 }
 
-/* Miller-Rabin primality test, iteration signifies the accuracy of the test */
+/// Funkcija koja koristi miller-rabin-ovu metodu za racunanje sledeceg prostog broja.
 BOOL _HashTable_miller_rabin(long long p, int iteration) {
 	if (p < 2) {
 		return FALSE;
@@ -125,30 +125,42 @@ BOOL HashTable_initialize_table(HashTable* table, unsigned int minimal_size, voi
 
 HashNode* HashTable_get(HashTable* table, void* key) {
 	if (table != NULL && key != NULL && table->_table != NULL) {
-		uint32_t index = _HashTable_get_hash(key) % table->size;
-		uintptr_t pointer_value = (uintptr_t)key;
+		uint32_t index = _HashTable_get_hash(key) % table->size;	
 
 		/// iteriraj kroz bucket u kojem se nalazi element, i u slucaju pronalaska vrati pokazivac na element.
 		for (HashNode* node = table->_table[index]; node != NULL; node = node->next) {
-			if (node->key == pointer_value)
+			if (node->key == key)
 				return node;
 		}
+		return NULL;
 	}
 	else
 		return NULL;
 
 }
 
-void _HashTable_rebuild_table(HashTable* table) {
+void _HashTable_rebuild_table(HashTable* table, BOOL is_table_increasing) {
 	HashNode** old_table, * next, * current;
 	unsigned int old_size, index, i;
-
+	float table_direction = 0;
 	old_table = table->_table;
 	old_size = table->size;
-	int new_size = old_size << 1;
+	int new_size = 0;
+	if (is_table_increasing) {
+		new_size = old_size << 1;
+		table_direction = 2;
+	}
+	else {
+		new_size = old_size >> 1;
+		if (new_size < table->minimal_size)
+			new_size = table->minimal_size;
+
+		table_direction = 0.5;
+	}
+
 	if (new_size % 2 == 0)
 		new_size++;
-	for (; new_size < 4 * old_size; new_size += 2)
+	for (; new_size < 2 * table_direction * old_size; new_size += 2)
 		if (_HashTable_miller_rabin(new_size, 20))
 			break;
 
@@ -157,7 +169,7 @@ void _HashTable_rebuild_table(HashTable* table) {
 	for (int i = 0; i < table->size; i++) {
 		table->_table[i] = NULL;
 	}
-	
+
 	for (i = 0; i < old_size; i++) {
 		next = old_table[i];
 		while (next) {
@@ -177,7 +189,7 @@ BOOL HashTable_insert(HashTable* table, void* key, void* value) {
 		if (HashTable_get(table, key) == NULL) {
 
 			if (table->entries >= table->size * 0.75) ///< u slucaju da je tabela popunjena vise od 75%, zbog performansa joj je potrebno duplo povecati velicinu.
-				_HashTable_rebuild_table(table);
+				_HashTable_rebuild_table(table,TRUE);
 
 			uint32_t index = _HashTable_get_hash(key) % table->size;
 
@@ -204,7 +216,7 @@ BOOL HashTable_insert(HashTable* table, void* key, void* value) {
 
 
 BOOL HashTable_delete(HashTable* table, void* key,void** out_value) {
-	if (table != NULL && key != NULL && table->_table != NULL) {
+	if (table != NULL && key != NULL) {
 		HashNode* node = HashTable_get(table, key); ///< dobavi element sa datim kljucem
 
 		if (node != NULL) {
@@ -225,6 +237,8 @@ BOOL HashTable_delete(HashTable* table, void* key,void** out_value) {
 			table->entries--;
 			*out_value = node->value;
 			table->node_free_function(node);
+			if (table->size > table->minimal_size&& table->entries <= table->size * 0.25)
+				_HashTable_rebuild_table(table, FALSE);
 			return TRUE;
 		}
 		else

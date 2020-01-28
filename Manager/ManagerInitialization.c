@@ -2,16 +2,16 @@
 
 
 inline void node_free_function(HashNode* node) {
-	HeapManipulation_free_memory(node, _dictionary._dict_heap);
+	HeapManipulation_free_memory_unlocked(node, _dictionary._dict_heap);
 }
 inline void* node_allocate_function() {
-	return HeapManipulation_allocate_memory(sizeof(HashNode), _dictionary._dict_heap);
+	return HeapManipulation_allocate_memory_unlocked(sizeof(HashNode), _dictionary._dict_heap);
 }
 inline void* bucket_list_allocating_function(int buckets) {
-	return HeapManipulation_allocate_memory(sizeof(HashNode*) * buckets, _dictionary._dict_heap);
+	return HeapManipulation_allocate_memory_unlocked(sizeof(HashNode*) * buckets, _dictionary._dict_heap);
 }
 inline void bucket_list_free_function(HashNode** table) {
-	HeapManipulation_free_memory(table, _dictionary._dict_heap);
+	HeapManipulation_free_memory_unlocked(table, _dictionary._dict_heap);
 }
 
 /// Funkcija inicijalizuje manager pa tabelu.
@@ -19,8 +19,6 @@ inline void bucket_list_free_function(HashNode** table) {
 /// Ako manager nije inicijalizovan, a recnik jeste vratice true i nastavice da koristi vec inicijalizovan recnik.
 BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 	BOOL ret = TRUE;
-
-	if (_manager != NULL) {
 
 		/// Provera da li je heap_count > 0, vraca FALSE ako nije.
 		if (heap_count > 0)
@@ -49,7 +47,7 @@ BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 					_dictionary._table = HeapManipulation_allocate_memory(sizeof(HashTable), _dictionary._dict_heap);
 					
 					/// Inicijalizuje hash tabelu
-					if (_dictionary._table != NULL && HashTable_initialize_table(_dictionary._table, 1000, compare_keys, bucket_list_allocating_function, bucket_list_free_function, node_allocate_function, node_free_function))
+					if (_dictionary._table != NULL && HashTable_initialize_table(_dictionary._table, 1000, bucket_list_allocating_function, bucket_list_free_function, node_allocate_function, node_free_function))
 						_dictionary._is_initialized = TRUE;
 				}
 				else {
@@ -59,9 +57,6 @@ BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 				}
 			}
 		}
-	}
-	else
-		return FALSE;
 
 	return ret;
 }
