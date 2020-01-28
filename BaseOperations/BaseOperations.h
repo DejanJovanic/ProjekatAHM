@@ -4,6 +4,25 @@
 #include <stdio.h>
 
 BOOL InitializeWindowsSockets();
-void CustomSelect(SOCKET s, char operation);
-void CustomSend(SOCKET s, char* niz, int brojBajtova);
-int CustomRecieve(SOCKET s, char** niz);
+/**
+*	Base_custom_select() - Osluskuje da li je moguce slanje ili primanje podataka
+*
+*	s			: soket za konekciju
+*	operation	: operacija koja se slusa, r - read, w - write
+**/
+void Base_custom_select(SOCKET s, char operation);
+/**
+*	Base_custom_send() - Salje poruku nasumicne duzine
+*
+*	s			: soket za konekciju
+*	niz			: niz sa sadrzajem poruke
+*	broj_bajtova: duzina poruke
+**/
+void Base_custom_send(SOCKET s, char* niz, int brojBajtova);
+/**
+*	Base_custom_recieve() - Prima poruku nasumicne duzine
+*
+*	s	: soket za konekciju
+*	niz	: adresa niza u koji cemo smestiti podatke
+**/
+int Base_custom_recieve(SOCKET s, char** niz);

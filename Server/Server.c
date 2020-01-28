@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "../DataSerialization/DataSerializationOperations.h"
 #include "../BaseOperations/BaseOperations.h"
-#include "../DataCollections/List.h"
+#include "../DataCollections/Message.h"
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
@@ -18,21 +18,6 @@
 
 int  main(void)
 {
-	/*
-	pak* head = NULL;
-	pak* tail = NULL;
-	char* c[10];
-	for (int i = 0; i < 10; i++) {
-		c[i] = (char *)malloc(2* sizeof(char));
-		c[i][0] = ('0' + i);
-		c[i][1] = 0;
-		Push(&head, &tail, 2, c[i]);
-	}
-	
-	pak p = Pop(&head, &tail);
-	printf(p.data);
-	*/
-	
     SOCKET listenSocket = INVALID_SOCKET;
     SOCKET acceptedSocket = INVALID_SOCKET;
     int iResult;
@@ -40,8 +25,8 @@ int  main(void)
 	pak* head = NULL;
 	pak* tail = NULL;
 
-	char* recievedData;
-	int brojBajtova = 0;
+	char* message;
+	int length = 0;
 
     if(InitializeWindowsSockets() == FALSE)
     {
@@ -102,7 +87,7 @@ int  main(void)
 
 	do
 	{
-		CustomSelect(listenSocket, 1);
+		Base_custom_select(listenSocket, 'r');
         acceptedSocket = accept(listenSocket, NULL, NULL);
 
         if (acceptedSocket == INVALID_SOCKET)
@@ -115,12 +100,16 @@ int  main(void)
 
         do
         {
-			CustomSelect(acceptedSocket, 'r');
-            brojBajtova = CustomRecieve(acceptedSocket, &recievedData);
+			Base_custom_select(acceptedSocket, 'r');
+			Base_custom_recieve(acceptedSocket, &message);
+			printf("%s\n", message);
+			free(message);
 
-			Deserialize(&head, &tail, recievedData, brojBajtova);
-			Data_print_list(head);
-
+			//vracanje poruke nasumicne duzine
+			length = Data_generate_message(&message);
+			Base_custom_select(acceptedSocket, 'w');
+			Base_custom_send(acceptedSocket, message, length);
+			
         } while (iResult > 0);
 
 		Sleep(2000);

@@ -7,6 +7,7 @@ void Serialize(pak* head, zpak**serializedData, int n) {
 
 	for (int i = 0; i < n; i++) {
 		(*serializedData)[i].data = head->data;
+		(*serializedData)[i].size = head->size;
 		head = head->next;
 	}
 }

@@ -2,11 +2,13 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <conio.h>
+#include <stdlib.h>
 #include <windows.h>
 #include <winsock2.h>
 
 #include "../DataSerialization/DataSerializationOperations.h"
 #include "../BaseOperations/BaseOperations.h"
+#include "../DataCollections/Message.h"
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
@@ -15,40 +17,19 @@
 #define DEFAULT_BUFLEN 2
 #define DEFAULT_PORT 27016
 
-void AddToList(pak** head, pak** tail, int num, struct Packet* next) {
 
-	pak *p = (pak*)malloc(sizeof(pak));
-	p->data = num;
-	p->next = NULL;
 
-	if (*head == NULL) {
-		*head = *tail = p;
-		return;
-	}
-
-	(*tail)->next = p;
-	*tail = p;
-}
-
-void PrintList(pak* head) {
-
-	while (head != NULL) {
-		printf("%d\t", head->data);
-		head = head->next;
-	}
-
-}
 
 int __cdecl main(int argc, char **argv)
 {
 	zpak* serializedList;
 	pak* head = NULL;
 	pak* tail = NULL;
-	// 100 000 000 / 4 = 25 000 000
-	int counter = 0;
-	do {
-		AddToList(&head, &tail, counter, NULL);
-	} while (++counter < 25000000);
+
+	char* message;
+	int length = 0;
+	
+	
 
 
 	SOCKET connectSocket = INVALID_SOCKET;
@@ -91,11 +72,27 @@ int __cdecl main(int argc, char **argv)
 	unsigned long int nonBlockingMode = 1;
 	iResult = ioctlsocket(connectSocket, FIONBIO, &nonBlockingMode);
 
-	Serialize(head, &serializedList, counter);
 
-	int velicinaPaketa = sizeof(*serializedList)*counter;
-	CustomSelect(connectSocket, 'w');
-	CustomSend(connectSocket, (char*)serializedList, &velicinaPaketa);
+	length = Data_generate_message(&message);
+
+	Base_custom_select(connectSocket, 'w');
+	Base_custom_send(connectSocket, message, length);
+
+	free(message);
+	do {
+
+		Base_custom_select(connectSocket, 'r');
+		length = Base_custom_recieve(connectSocket, &message);
+		printf("%s\n", message);
+	} while (length < 1);
+
+
+
+	//Serialize(head, &serializedList, counter * 7);
+
+	//int velicinaPaketa = sizeof(*serializedList)*counter;
+	//
+	//CustomSend(connectSocket, (char*)serializedList, velicinaPaketa);
 
 	if (iResult == SOCKET_ERROR)
 	{
