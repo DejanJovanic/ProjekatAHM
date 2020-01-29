@@ -24,7 +24,7 @@ Heap HeapCreation_create_infinite_heap(int initial_commited_bytes) {
 			HeapInfo.Flags = 0;
 			//BOOL b = HeapQueryInformation(a, 3, &HeapInfo, sizeof(HeapInfo), NULL);
 			///BOOL b = HeapSetInformation(a, HeapCompatibilityInformation, &heapinfo2, sizeof(heapinfo2));
-			BOOL c = HeapSetInformation(a, HeapOptimizeResources, &HeapInfo,sizeof(HeapInfo));
+			//BOOL c = HeapSetInformation(a, HeapOptimizeResources, &HeapInfo,sizeof(HeapInfo));
 			return a;
 		}
 		else return NULL;
