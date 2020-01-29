@@ -166,6 +166,12 @@ void _HashTable_rebuild_table(HashTable* table, BOOL is_table_increasing) {
 
 	table->size = new_size;
 	table->_table = table->bucket_list_allocating_function(table->size);
+	if (table->_table == NULL) {
+		table->_table = old_table;
+		table->size = old_size;
+		return;
+	}
+		
 	for (int i = 0; i < table->size; i++) {
 		table->_table[i] = NULL;
 	}
@@ -191,6 +197,8 @@ BOOL HashTable_insert(HashTable* table, void* key, void* value) {
 			if (table->entries >= table->size * 0.75) ///< u slucaju da je tabela popunjena vise od 75%, zbog performansa joj je potrebno duplo povecati velicinu.
 				_HashTable_rebuild_table(table,TRUE);
 
+			if (table->_table == NULL)
+				return FALSE;
 			uint32_t index = _HashTable_get_hash(key) % table->size;
 
 			HashNode* node = (HashNode*)table->node_allocate_function();
