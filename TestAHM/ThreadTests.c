@@ -1,14 +1,15 @@
 #include "ThreadTests.h"
 
-
-void ThreadTests_initialize_test(int number_of_threads)
-{
+int brojac = 0;
+void ThreadTests_custom_malloc_initialize(int number_of_threads, int number_of_heaps){
+	
+	ManagerInitialization_initialize_manager(number_of_heaps);
+	
 	clock_t start_time, end_time;
 	double cpu_time_used;
 	int number_of_bytes = 220000 / number_of_threads;
 
 	printf("\n\tCustom malloc i free funkcije\n", number_of_threads);
-
 	
 	HANDLE* threads;
 	threads = (HANDLE)malloc(number_of_threads * sizeof(HANDLE));
@@ -29,8 +30,20 @@ void ThreadTests_initialize_test(int number_of_threads)
 	for (int i = 0; i < number_of_threads; i++) {
 		CloseHandle(*(threads + i));
 	}
+	free(threads);
+	printf("NIJE NULL %d\n", brojac);
+	brojac = 0;
+	ManagerInitialization_destroy_manager();
+	return 0;
+}
+void ThreadTests_malloc_initialize(int number_of_threads){
+	
+	clock_t start_time, end_time;
+	double cpu_time_used;
+	int number_of_bytes = 220000 / number_of_threads;
 
-
+	HANDLE* threads;
+	threads = (HANDLE)malloc(number_of_threads * sizeof(HANDLE));
 	printf("\n\tMalloc i free funkcije\n", number_of_threads);
 
 	for (int i = 0; i < number_of_threads; i++) {
@@ -51,32 +64,28 @@ void ThreadTests_initialize_test(int number_of_threads)
 		CloseHandle(*(threads + i));
 	}
 	free(threads);
-	
-	return 0;
-	
 }
+
 DWORD WINAPI ThreadTests_custom_malloc(LPVOID lpParam) {
 
 	void* items[10000];
 	int number_of_bytes = (int)lpParam;
-	int brojac = 0;
+
 	for (int i = 0; i < 10000; i++) {
 		items[i] = thread_malloc(number_of_bytes);
 	}
 
 	for (int i = 0; i < 10000; i++) {
-		if(items[i] != NULL)
+		if (items[i] != NULL)
+		{
+			brojac++;
 			thread_free(items[i]);
+		}
 	}
-	
-
 
 	return 0;
-
 }
-
-DWORD WINAPI ThreadTests_malloc(LPVOID lpParam)
-{
+DWORD WINAPI ThreadTests_malloc(LPVOID lpParam){
 
 	void* items[10000];
 	int number_of_bytes = (int)lpParam;
@@ -91,5 +100,4 @@ DWORD WINAPI ThreadTests_malloc(LPVOID lpParam)
 	}
 	
 	return 0;
-
 }
