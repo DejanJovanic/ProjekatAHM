@@ -32,5 +32,8 @@
     <ClCompile Include="ManagerOperations.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Dictionary.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,13 +1,13 @@
 #include "ThreadTests.h"
-
+CRITICAL_SECTION cs;
 int brojac = 0;
 void ThreadTests_custom_malloc_initialize(int number_of_threads, int number_of_heaps){
 	
 	ManagerInitialization_initialize_manager(number_of_heaps);
-	
+	InitializeCriticalSection(&cs);
 	clock_t start_time, end_time;
 	double cpu_time_used;
-	int number_of_bytes = 220000 / number_of_threads;
+	int number_of_bytes = 400000 / number_of_threads;
 
 	printf("\n\tCustom malloc i free funkcije\n", number_of_threads);
 	
@@ -34,6 +34,7 @@ void ThreadTests_custom_malloc_initialize(int number_of_threads, int number_of_h
 	printf("NIJE NULL %d\n", brojac);
 	brojac = 0;
 	ManagerInitialization_destroy_manager();
+	DeleteCriticalSection(&cs);
 	return 0;
 }
 void ThreadTests_malloc_initialize(int number_of_threads){
@@ -78,7 +79,9 @@ DWORD WINAPI ThreadTests_custom_malloc(LPVOID lpParam) {
 	for (int i = 0; i < 10000; i++) {
 		if (items[i] != NULL)
 		{
+			EnterCriticalSection(&cs);
 			brojac++;
+			LeaveCriticalSection(&cs);
 			thread_free(items[i]);
 		}
 	}

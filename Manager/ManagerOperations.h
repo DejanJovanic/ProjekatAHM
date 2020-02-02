@@ -16,10 +16,10 @@
 */
 #ifndef MANAGER_DEFINE
 	HeapManager* _manager;
-	Dictionary _dictionary;
+	Dictionary* _dictionary;
 #else
 	extern HeapManager* _manager;
-	extern Dictionary _dictionary;
+	extern Dictionary* _dictionary;
 #endif
 
 /**

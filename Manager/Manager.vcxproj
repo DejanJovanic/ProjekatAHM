@@ -163,6 +163,7 @@
     <ClInclude Include="Structs.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Dictionary.c" />
     <ClCompile Include="ManagerInitialization.c" />
     <ClCompile Include="ManagerOperations.c" />
   </ItemGroup>

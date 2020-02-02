@@ -1,10 +1,11 @@
 #include "ManagerOperations.h"
+#include "Dictionary.c"
 /// Zauzima trazenu memoriju.
 /// To radi tako sto od manager-a trazi Heap iz kojeg moze da trazi memoriju,i tada radi alokaciju.
 /// Heap se dobija po Round robin tehnici.
 /// Ako se memorija uspesno alocira, ubacuje se u recnik pointer -> heap, sto omogucuje dealokaciju memorije.
 void* thread_malloc(int bytes) {
-	if (_manager == NULL && !_dictionary._is_initialized)
+	if (_manager == NULL && _dictionary == NULL)
 		exit(MANAGER_UNINITIALIZED_ERROR);
 
 	Heap heap;
@@ -13,9 +14,10 @@ void* thread_malloc(int bytes) {
 		pointer = HeapManipulation_allocate_memory(bytes, heap);
 		BOOL is_inserted = FALSE;
 		if (pointer != NULL) {
-			EnterCriticalSection(&_dictionary._cs);
-				is_inserted = HashTable_insert(_dictionary._table, pointer,heap); ///< ubacuje u recnik.
-			LeaveCriticalSection(&_dictionary._cs);
+			is_inserted = Dictionary_insert(pointer, heap);
+		}
+		else {
+			int a = 2;
 		}
 		if (is_inserted == FALSE) {
 			HeapManipulation_free_memory(pointer, heap);
@@ -33,17 +35,13 @@ void thread_free(void* pointer) {
 	if (pointer == NULL)
 		exit(NULL_SENT_ERROR);
 
-	if (!_dictionary._is_initialized && _manager == NULL)
+	if (_dictionary == NULL && _manager == NULL)
 		exit(MANAGER_UNINITIALIZED_ERROR);
 
 	Heap heap = NULL;
-	BOOL is_deleted = FALSE;
+	BOOL is_removed = Dictionary_remove(pointer,&heap);
 
-	EnterCriticalSection(&_dictionary._cs);
-		is_deleted = HashTable_delete(_dictionary._table, pointer, &heap);
-	LeaveCriticalSection(&_dictionary._cs);
-	
-	if(is_deleted)
+	if(is_removed)
 		HeapManipulation_free_memory(pointer, heap);
 
 }
