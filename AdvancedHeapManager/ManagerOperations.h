@@ -1,5 +1,5 @@
 #pragma once
-#include "..\BaseManagerOperations\HeapManipulationOperations.h"
+#include "..\HeapManager\HeapManipulationOperations.h"
 #include "..\HeapOperations\HeapManipulation.h"
 #include "Structs.h"
 

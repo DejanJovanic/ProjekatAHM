@@ -18,13 +18,28 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HeapAddingOperations.h" />
+    <ClInclude Include="HeapManagerOperations.h" />
+    <ClInclude Include="HeapManipulationOperations.h" />
+    <ClInclude Include="Structs.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="HeapAddingOperations.c" />
+    <ClCompile Include="HeapManagerOperations.c" />
+    <ClCompile Include="HeapManipulationOperations.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HeapOperations\HeapOperations.vcxproj">
+      <Project>{df2875fd-5363-4432-9ea9-a23efe85e8d4}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{5E89E521-93E0-4CBD-9FA2-E9C3EE694310}</ProjectGuid>
+    <ProjectGuid>{27E1F633-F353-49D6-86D9-EFC7CB31AC91}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>AHM</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
-    <ProjectName>BaseManagerOperations</ProjectName>
+    <RootNamespace>HeapManager</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -43,7 +58,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -99,7 +114,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -147,25 +162,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="HeapAddingOperations.c" />
-    <ClCompile Include="HeapManipulationOperations.c" />
-    <ClCompile Include="HeapManagerOperations.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="HeapAddingOperations.h" />
-    <ClInclude Include="HeapManipulationOperations.h" />
-    <ClInclude Include="HeapManagerOperations.h" />
-    <ClInclude Include="Structs.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Collections\Collections.vcxproj">
-      <Project>{114699d1-ed18-4d4c-b10a-292151b3165c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\HeapOperations\HeapOperations.vcxproj">
-      <Project>{df2875fd-5363-4432-9ea9-a23efe85e8d4}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

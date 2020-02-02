@@ -2,8 +2,8 @@
 #include "stdio.h"
 #include "windows.h"
 #include "time.h"
-#include "..\Manager\ManagerInitialization.h"
-#include "..\Manager\ManagerOperations.h"
+#include "..\AdvancedHeapManager\ManagerInitialization.h"
+#include "..\AdvancedHeapManager\ManagerOperations.h"
 
 DWORD WINAPI ThreadTests_custom_malloc(LPVOID lpParam);
 DWORD WINAPI ThreadTests_malloc(LPVOID lpParam);

@@ -1,5 +1,6 @@
 #pragma once
 #include "Structs.h"
+#include "..\HeapOperations\HeapManipulation.h"
 
 /**
 * Dobavlja Handle na heap u HeapManageru.
@@ -14,3 +15,5 @@
 * return: BOOL vrednost koja indicira na uspesnost izvrsene operacije.
 */
 BOOL HeapManipulationOperations_get_heap(HeapManager* manager, Heap* out_heap);
+
+void* HeapManipulationOperations_get_memory(HeapManager* manager, int memory_size);

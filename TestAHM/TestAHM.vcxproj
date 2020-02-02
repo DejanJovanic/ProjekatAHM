@@ -26,8 +26,8 @@
     <ClCompile Include="ThreadTests.c" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Manager\Manager.vcxproj">
-      <Project>{3a91f333-9060-4c3a-aa74-cae3b2d47aa4}</Project>
+    <ProjectReference Include="..\AdvancedHeapManager\AdvancedHeapManager.vcxproj">
+      <Project>{64f820a9-f19a-4f94-893d-5c7b10d59350}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">

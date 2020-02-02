@@ -1,5 +1,5 @@
 #pragma once
-#include "..\BaseManagerOperations\Structs.h"
+#include "..\HeapManager\Structs.h"
 #include "..\Collections\HashTable.h"
 
 typedef struct dict {

@@ -10,8 +10,8 @@ void* thread_malloc(int bytes) {
 
 	Heap heap;
 	void* pointer = NULL;
-	if (bytes > 0 && HeapManipulationOperations_get_heap(_manager, &heap)) { ///< dobavlja heap
-		pointer = HeapManipulation_allocate_memory(bytes, heap);
+	if (bytes > 0) { ///< dobavlja heap
+		pointer = HeapManipulationOperations_get_memory(_manager, bytes);
 		BOOL is_inserted = FALSE;
 		if (pointer != NULL) {
 			is_inserted = _Dictionary_insert(pointer, heap);

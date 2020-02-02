@@ -14,7 +14,14 @@ BOOL HeapManipulationOperations_get_heap(HeapManager* manager, Heap* out_heap) {
 			ret = TRUE;
 		}
 	}
-
 	return ret;
 
+}
+
+void* HeapManipulationOperations_get_memory(HeapManager* manager, int memory_size) {
+	Heap heap;
+	if (HeapManipulationOperations_get_heap(manager, &heap)) 
+		return HeapManipulation_allocate_memory(memory_size, heap);
+	else
+		return NULL;
 }

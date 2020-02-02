@@ -1,6 +1,6 @@
 #pragma once
-#include "..\BaseManagerOperations\HeapManagerOperations.h"
-#include "..\BaseManagerOperations\HeapAddingOperations.h"
+#include "..\HeapManager\HeapManagerOperations.h"
+#include "..\HeapManager\HeapAddingOperations.h"
 #include "Structs.h"
 /**
 * Define koji deklarise objekte heap manager-a i recnika.
