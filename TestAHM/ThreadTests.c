@@ -1,9 +1,9 @@
 #include "ThreadTests.h"
 CRITICAL_SECTION cs;
 int brojac = 0;
-void ThreadTests_custom_malloc_initialize(int number_of_threads, int number_of_heaps){
+void ThreadTests_custom_malloc_initialize(int number_of_threads){
 	
-	ManagerInitialization_initialize_manager(number_of_heaps);
+
 	InitializeCriticalSection(&cs);
 	clock_t start_time, end_time;
 	double cpu_time_used;
@@ -33,7 +33,6 @@ void ThreadTests_custom_malloc_initialize(int number_of_threads, int number_of_h
 	free(threads);
 	printf("NIJE NULL %d\n", brojac);
 	brojac = 0;
-	ManagerInitialization_destroy_manager();
 	DeleteCriticalSection(&cs);
 	return 0;
 }
