@@ -1,5 +1,5 @@
 #include "ManagerInitialization.h"
-#include "Dictionary.c"
+#include "Dictionary.h"
 /// Funkcija inicijalizuje manager pa tabelu.
 /// Ako je manager vec inicijalizovan, vraca false.
 /// Ako manager nije inicijalizovan, a recnik jeste vratice true i nastavice da koristi vec inicijalizovan recnik.
@@ -24,7 +24,7 @@ BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 		if (ret == FALSE)
 			HeapManagerOperations_destroy_manager_with_heaps(&_manager);
 		else {
-			ret = Dictionary_create(1000);
+			ret = _Dictionary_create(1000);
 		}
 
 	return ret;
@@ -41,7 +41,7 @@ BOOL ManagerInitialization_destroy_manager()
 		ret = TRUE;
 	}
 	if (_dictionary != NULL) {
-		Dictionary_destroy();
+		_Dictionary_destroy();
 		ret = TRUE;
 	}
 	

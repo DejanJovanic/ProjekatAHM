@@ -1,9 +1,6 @@
-#include "Structs.h"
-#include "..\HeapOperations\HeapCreation.h"
-#include "..\HeapOperations\HeapDestruction.h"
-#include "..\HeapOperations\HeapManipulation.h"
+#include "Dictionary.h"
 
-extern Dictionary* _dictionary;
+
 
 inline void node_free_function(HashNode* node) {
 	HeapManipulation_free_memory_unlocked(node, _dictionary->_dict_heap);
@@ -17,7 +14,7 @@ inline void* bucket_list_allocating_function(int buckets) {
 inline void bucket_list_free_function(HashNode** table) {
 	HeapManipulation_free_memory_unlocked(table, _dictionary->_dict_heap);
 }
-BOOL static Dictionary_create(int minimal_size) {
+BOOL _Dictionary_create(int minimal_size) {
 	BOOL is_ok = FALSE;
 	_dictionary = malloc(sizeof(Dictionary));
 	if (_dictionary != NULL) {
@@ -43,7 +40,7 @@ BOOL static Dictionary_create(int minimal_size) {
 	return is_ok;
 }
 
-BOOL static Dictionary_insert(void* key, void* value) {
+BOOL _Dictionary_insert(void* key, void* value) {
 	BOOL is_inserted = FALSE;
 	EnterCriticalSection(&_dictionary->_cs);
 		is_inserted = HashTable_insert(_dictionary->_table, key,value); ///< ubacuje u recnik.
@@ -51,7 +48,7 @@ BOOL static Dictionary_insert(void* key, void* value) {
 	return is_inserted;
 }
 
-BOOL static Dictionary_remove(void* key, void** value){
+BOOL _Dictionary_remove(void* key, void** value){
 	BOOL is_removed = FALSE;
 	EnterCriticalSection(&_dictionary->_cs);
 		is_removed = HashTable_delete(_dictionary->_table, key, value);
@@ -59,7 +56,7 @@ BOOL static Dictionary_remove(void* key, void** value){
 	return is_removed;
 }
 
-void static Dictionary_destroy() {
+void _Dictionary_destroy() {
 	if (_dictionary != NULL) {
 		EnterCriticalSection(&_dictionary->_cs);
 		HashTable_deinitialize_table(_dictionary->_table); ///< Deinicijalizuj hash tabelu.

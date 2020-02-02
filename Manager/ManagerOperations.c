@@ -1,5 +1,5 @@
 #include "ManagerOperations.h"
-#include "Dictionary.c"
+#include "Dictionary.h"
 /// Zauzima trazenu memoriju.
 /// To radi tako sto od manager-a trazi Heap iz kojeg moze da trazi memoriju,i tada radi alokaciju.
 /// Heap se dobija po Round robin tehnici.
@@ -14,7 +14,7 @@ void* thread_malloc(int bytes) {
 		pointer = HeapManipulation_allocate_memory(bytes, heap);
 		BOOL is_inserted = FALSE;
 		if (pointer != NULL) {
-			is_inserted = Dictionary_insert(pointer, heap);
+			is_inserted = _Dictionary_insert(pointer, heap);
 		}
 		else {
 			int a = 2;
@@ -39,7 +39,7 @@ void thread_free(void* pointer) {
 		exit(MANAGER_UNINITIALIZED_ERROR);
 
 	Heap heap = NULL;
-	BOOL is_removed = Dictionary_remove(pointer,&heap);
+	BOOL is_removed = _Dictionary_remove(pointer,&heap);
 
 	if(is_removed)
 		HeapManipulation_free_memory(pointer, heap);
