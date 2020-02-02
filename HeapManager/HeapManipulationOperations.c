@@ -18,10 +18,12 @@ BOOL HeapManipulationOperations_get_heap(HeapManager* manager, Heap* out_heap) {
 
 }
 
-void* HeapManipulationOperations_get_memory(HeapManager* manager, int memory_size) {
+void* HeapManipulationOperations_get_memory(HeapManager* manager, int memory_size,Heap* out_heap) {
 	Heap heap;
-	if (HeapManipulationOperations_get_heap(manager, &heap)) 
+	if (HeapManipulationOperations_get_heap(manager, &heap)) {
+		*out_heap = heap;
 		return HeapManipulation_allocate_memory(memory_size, heap);
+	}
 	else
 		return NULL;
 }
