@@ -1,5 +1,7 @@
 #pragma once
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 /**
 *	Data_generate_message() - Generise poruku nasumicne duzine, vraca duzinu poruke
 *

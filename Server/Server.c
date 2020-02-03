@@ -4,9 +4,12 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include "../DataSerialization/DataSerializationOperations.h"
 #include "../BaseOperations/BaseOperations.h"
 #include "../DataCollections/Message.h"
+#include "../AdvancedHeapManager/ManagerInitialization.h"
+#include "../AdvancedHeapManager/ManagerOperations.h"
 
 #pragma warning (disable:4996)
 #pragma comment (lib, "Ws2_32.lib")
@@ -152,15 +155,32 @@ DWORD WINAPI listen_thread_function(LPVOID param)
 			printf("New client request accepted (%d). Client address: %s : %d\n", counter, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 			
 			Base_custom_select(client_sockets[counter], 'r');
-			Base_custom_recieve(client_sockets[counter], &message);
-			printf("Primio od klijenta: %s\n", message);
+			int bytes_recieved = Base_custom_recieve(client_sockets[counter], &message);
+			//printf("Primio od klijenta: %s\n", message);
+
+			ManagerInitialization_initialize_manager(5);
+			clock_t start_time, end_time;
+			double cpu_time_used;
+			start_time = clock();
+
+			char* message_for_advanced_malloc = advanced_malloc(bytes_recieved);
+			advanced_free(message_for_advanced_malloc);
+
+			end_time = clock();
+			cpu_time_used = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
+
+			printf("Vreme potrebno za zauzimanje %d bajtova advanced malloc i free je : %f\n", bytes_recieved, cpu_time_used);
+
 			free(message);
+
+
+			ManagerInitialization_destroy_manager();
 			//counter++;
 			//vracanje poruke nasumicne duzine
 			length = Data_generate_message(&message, counter + 10);
 			Base_custom_select(client_sockets[counter], 'w');
 			Base_custom_send(client_sockets[counter], message, length);
-			printf("Saljem na klijenta: %s\n\n", message);
+			//printf("Saljem na klijenta: %s\n\n", message);
 			free(message);
 			counter++;
 		}
