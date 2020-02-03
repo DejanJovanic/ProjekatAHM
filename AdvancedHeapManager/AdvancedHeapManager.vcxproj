@@ -36,6 +36,9 @@
     <ProjectReference Include="..\HeapManager\HeapManager.vcxproj">
       <Project>{27e1f633-f353-49d6-86d9-efc7cb31ac91}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\HeapOperations\HeapOperations.vcxproj">
+      <Project>{df2875fd-5363-4432-9ea9-a23efe85e8d4}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
