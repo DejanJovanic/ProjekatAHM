@@ -5,7 +5,7 @@
 /**
 *	Data_generate_message() - Generise poruku nasumicne duzine, vraca duzinu poruke
 *
-*	message		: pokazivac na niz karaktera u koji ce se smestiti generisana poruka
-*	moduo		: na osnovu modula se generise duzina poruke
+*	message			: pokazivac na niz karaktera u koji ce se smestiti generisana poruka
+*	random_length	: celobrojna vrednost na osnovu koje se generise duzina poruke
 **/
-int Data_generate_message(char** message, int moduo);
+int Data_generate_message(char** message, int random_length);
