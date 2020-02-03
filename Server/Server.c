@@ -23,6 +23,8 @@ DWORD WINAPI listen_thread_function(LPVOID lpParam);
 
 int  main(void)
 {
+	ManagerInitialization_initialize_manager(5);
+
     SOCKET listen_socket = INVALID_SOCKET;
     SOCKET accepted_socket = INVALID_SOCKET;
 	int result;
@@ -100,6 +102,8 @@ int  main(void)
         return 1;
     }
 
+
+	ManagerInitialization_destroy_manager();
     closesocket(listen_socket);
     closesocket(accepted_socket);
     WSACleanup();
@@ -158,7 +162,7 @@ DWORD WINAPI listen_thread_function(LPVOID param)
 			int bytes_recieved = Base_custom_recieve(client_sockets[counter], &message);
 			//printf("Primio od klijenta: %s\n", message);
 
-			ManagerInitialization_initialize_manager(5);
+			
 			clock_t start_time, end_time;
 			double cpu_time_used;
 			start_time = clock();
@@ -174,7 +178,7 @@ DWORD WINAPI listen_thread_function(LPVOID param)
 			free(message);
 
 
-			ManagerInitialization_destroy_manager();
+			
 			//counter++;
 			//vracanje poruke nasumicne duzine
 			length = Data_generate_message(&message, counter + 10);
