@@ -1,7 +1,7 @@
-#include "HeapManagerOperations.h"
+#include "HeapManagerInitialization.h"
 
 
-HeapManager* HeapManagerOperations_initialize_heap_manager(int heap_size,int maximal_heap_count) {
+HeapManager* HeapManagerInitialization_initialize_heap_manager(int heap_size,int maximal_heap_count) {
 	HeapManager* manager = (HeapManager*)malloc(sizeof(HeapManager));
 	if (manager != NULL) {
 		if (maximal_heap_count > 0) {
@@ -31,7 +31,7 @@ HeapManager* HeapManagerOperations_initialize_heap_manager(int heap_size,int max
 	return manager;
 }
 
-void HeapManagerOperations_destroy_manager(HeapManager** manager) {
+void HeapManagerInitialization_destroy_manager(HeapManager** manager) {
 	if (manager != NULL) {
 		HeapManager* temp = *manager;
 		if (temp != NULL) {
@@ -45,7 +45,7 @@ void HeapManagerOperations_destroy_manager(HeapManager** manager) {
 	}
 }
 
-void HeapManagerOperations_destroy_manager_with_heaps(HeapManager** manager) {
+void HeapManagerInitialization_destroy_manager_with_heaps(HeapManager** manager) {
 	if (manager != NULL) {
 		HeapManager* temp = *manager;
 		if (temp != NULL) {

@@ -43,7 +43,7 @@ BOOL _Dictionary_create(int minimal_size) {
 BOOL _Dictionary_insert(void* key, void* value) {
 	BOOL is_inserted = FALSE;
 	EnterCriticalSection(&_dictionary->_cs);
-		is_inserted = HashTable_insert(_dictionary->_table, key,value); ///< ubacuje u recnik.
+		is_inserted = HashTable_insert(_dictionary->_table, key,value); 
 	LeaveCriticalSection(&_dictionary->_cs);
 	return is_inserted;
 }

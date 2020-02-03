@@ -18,13 +18,13 @@
     <ClInclude Include="HeapAddingOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HeapManagerOperations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="HeapManipulationOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Structs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HeapManagerInitialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,10 +32,10 @@
     <ClCompile Include="HeapAddingOperations.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HeapManagerOperations.c">
+    <ClCompile Include="HeapManipulationOperations.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HeapManipulationOperations.c">
+    <ClCompile Include="HeapManagerInitialization.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

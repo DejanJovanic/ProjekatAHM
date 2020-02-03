@@ -32,7 +32,7 @@ void* HeapManipulation_allocate_memory_unlocked(int bytes, Heap heap);
 /**
 * Funkcija koja dealocira memoriju.
 * Funkcija je "thread-safe", ako je i heap "thread-safe".
-* U slucaju da je prosledjen pointer NULL pokazivac , ili je heap NULL, funkcija vraca NULL pokazivac.
+* U slucaju da je prosledjen pointer NULL pokazivac , ili je heap NULL, funkcija vraca FALSE.
 * U slucaju da pokazivac pokazuje na heap koji je drugaciji od prosledjenog, aplikacija baca exception.
 *
 * pointer: pokazivac na pocetak prethodno alociranog memorijskog bloka.
@@ -45,7 +45,7 @@ BOOL HeapManipulation_free_memory(void* pointer, Heap heap);
 /**
 * Funkcija koja dealocira memoriju.
 * Funkcija nije "thread-safe".
-* U slucaju da je prosledjen pointer NULL pokazivac , ili je heap NULL, funkcija vraca NULL pokazivac.
+* U slucaju da je prosledjen pointer NULL pokazivac , ili je heap NULL, funkcija vraca FALSE.
 * U slucaju da pokazivac pokazuje na heap koji je drugaciji od prosledjenog, aplikacija baca exception.
 *
 * pointer: pokazivac na pocetak prethodno alociranog memorijskog bloka.

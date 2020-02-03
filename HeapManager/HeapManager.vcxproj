@@ -20,13 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HeapAddingOperations.h" />
-    <ClInclude Include="HeapManagerOperations.h" />
+    <ClInclude Include="HeapManagerInitialization.h" />
     <ClInclude Include="HeapManipulationOperations.h" />
     <ClInclude Include="Structs.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HeapAddingOperations.c" />
-    <ClCompile Include="HeapManagerOperations.c" />
+    <ClCompile Include="HeapManagerInitialization.c" />
     <ClCompile Include="HeapManipulationOperations.c" />
   </ItemGroup>
   <ItemGroup>

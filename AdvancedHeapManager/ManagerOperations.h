@@ -32,7 +32,7 @@
 *
 * return: pokazivac na novo alociranu memoriju
 */
-void* thread_malloc(int	 bytes);
+void* advanced_malloc(int bytes);
 
 /**
 * Funkcija koja oslobadja prethodno alociran memorijski blok.
@@ -42,4 +42,4 @@ void* thread_malloc(int	 bytes);
 *
 * pointer: pokazivac na pocetak memorijskog bloka koji je potrebno osloboditi.
 */
-void thread_free(void* pointer);
+void advanced_free(void* pointer);

@@ -6,6 +6,7 @@ typedef HANDLE Heap;
 
 /**
 * Funkcija koja pravi heap sa maksimalnom velicinom koja se prosledjuje.
+* Stvara Heap koji je "thread-safe" u slucaju koriscenja thread-safe operacija.
 * Inicijalna komitovana kolicina memorije je 1/4 maksimalne velicine heap-a.
 * U slucaju da heap nije moguce stvoriti, ili je prosledjena vrednost <= 0, povratna vrednost je NULL.
 *
@@ -17,6 +18,7 @@ Heap HeapCreation_create_default_heap(int heap_size);
 
 /**
 * Funkcija koja pravi heap sa maksimalnom velicinom koja se prosledjuje.
+* Stvara Heap koji je "thread-safe" u slucaju koriscenja thread-safe operacija.
 * Inicijalna komitovana kolicina memorije je maksimalnoj velicini heap-a.
 * U slucaju da heap nije moguce stvoriti, ili je prosledjena vrednost <= 0, povratna vrednost je NULL.
 *
@@ -28,6 +30,7 @@ Heap HeapCreation_create_big_heap(int heap_size);
 
 /**
 * Funkcija koja pravi heap cija se velicina "beskonacno" povecava.
+* Stvara Heap koji je "thread-safe" u slucaju koriscenja thread-safe operacija.
 * Ako je prosledjena vrednost < 0, stvara se heap sa inicijalnom komitovanom velicinom od 50 MB.
 * U slucaju da heap nije moguce stvoriti, povratna vrednost je NULL.
 *

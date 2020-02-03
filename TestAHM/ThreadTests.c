@@ -9,7 +9,7 @@ void ThreadTests_custom_malloc_initialize(int number_of_threads){
 	double cpu_time_used;
 	int number_of_bytes = 400000 / number_of_threads;
 
-	printf("\n\tCustom malloc i free funkcije\n", number_of_threads);
+	printf("\n\tCustom malloc i free funkcije\n");
 	
 	HANDLE* threads;
 	threads = (HANDLE)malloc(number_of_threads * sizeof(HANDLE));
@@ -40,11 +40,11 @@ void ThreadTests_malloc_initialize(int number_of_threads){
 	
 	clock_t start_time, end_time;
 	double cpu_time_used;
-	int number_of_bytes = 220000 / number_of_threads;
+	int number_of_bytes = 40000 / number_of_threads;
 
 	HANDLE* threads;
 	threads = (HANDLE)malloc(number_of_threads * sizeof(HANDLE));
-	printf("\n\tMalloc i free funkcije\n", number_of_threads);
+	printf("\n\tMalloc i free funkcije\n");
 
 	for (int i = 0; i < number_of_threads; i++) {
 		*(threads + i) = CreateThread(NULL, 0, &ThreadTests_malloc, (LPVOID)number_of_bytes, 0, NULL);
@@ -72,7 +72,7 @@ DWORD WINAPI ThreadTests_custom_malloc(LPVOID lpParam) {
 	int number_of_bytes = (int)lpParam;
 
 	for (int i = 0; i < 10000; i++) {
-		items[i] = thread_malloc(number_of_bytes);
+		items[i] = advanced_malloc(number_of_bytes);
 	}
 
 	for (int i = 0; i < 10000; i++) {
@@ -81,7 +81,7 @@ DWORD WINAPI ThreadTests_custom_malloc(LPVOID lpParam) {
 			EnterCriticalSection(&cs);
 			brojac++;
 			LeaveCriticalSection(&cs);
-			thread_free(items[i]);
+			advanced_free(items[i]);
 		}
 	}
 

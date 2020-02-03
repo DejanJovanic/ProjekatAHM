@@ -8,7 +8,7 @@ BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 
 		/// Provera da li je heap_count > 0, vraca FALSE ako nije.
 		if (heap_count > 0)
-			_manager = HeapManagerOperations_initialize_heap_manager(0, heap_count); ///< inicijalizuje manager.
+			_manager = HeapManagerInitialization_initialize_heap_manager(0, heap_count); ///< inicijalizuje manager.
 		else
 			return FALSE;
 
@@ -22,7 +22,7 @@ BOOL ManagerInitialization_initialize_manager(unsigned heap_count) {
 		}
 		/// Ako su svi heap-ovi uspesno dodati nastavlja dalje.
 		if (ret == FALSE)
-			HeapManagerOperations_destroy_manager_with_heaps(&_manager);
+			HeapManagerInitialization_destroy_manager_with_heaps(&_manager);
 		else {
 			ret = _Dictionary_create(1000);
 		}
@@ -37,7 +37,7 @@ BOOL ManagerInitialization_destroy_manager()
 	BOOL ret = FALSE;
 
 	if (_manager != NULL) {
-		HeapManagerOperations_destroy_manager_with_heaps(&_manager);
+		HeapManagerInitialization_destroy_manager_with_heaps(&_manager);
 		ret = TRUE;
 	}
 	if (_dictionary != NULL) {

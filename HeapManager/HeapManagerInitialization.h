@@ -16,7 +16,7 @@
 *
 * return: pokazivac na inicijalizovan HeapManager.
 */
-HeapManager* HeapManagerOperations_initialize_heap_manager(int heap_size, int maximal_heap_count);
+HeapManager* HeapManagerInitialization_initialize_heap_manager(int heap_size, int maximal_heap_count);
 
 /**
 * Funkcija unistava heap manager i postavlja prosledjeni pokazivac na manager na NULL.
@@ -25,7 +25,7 @@ HeapManager* HeapManagerOperations_initialize_heap_manager(int heap_size, int ma
 *
 * manager: pokazivac na pokazivac na objekat heap managera kojeg je potrebno unistiti. 
 */
-void HeapManagerOperations_destroy_manager(HeapManager** manager);
+void HeapManagerInitialization_destroy_manager(HeapManager** manager);
 
 /**
 * Funkcija unistava heap manager i postavlja prosledjeni pokazivac na manager na NULL.
@@ -34,4 +34,4 @@ void HeapManagerOperations_destroy_manager(HeapManager** manager);
 *
 * manager: pokazivac na pokazivac na objekat heap managera kojeg je potrebno unistiti.
 */
-void HeapManagerOperations_destroy_manager_with_heaps(HeapManager** manager);
+void HeapManagerInitialization_destroy_manager_with_heaps(HeapManager** manager);
