@@ -1,14 +1,14 @@
 #include "HashTable.h"
 
 
-/* This function calculates (ab)%c */
+///Funkcija racuna (a^b)%c
 int _HashTable_modulo(int a, int b, int c) {
-	long long x = 1, y = a; // long long is taken to avoid overflow of intermediate results
+	long long x = 1, y = a; // long long jer moze doci do overflow-a int-a.
 	while (b > 0) {
 		if (b % 2 == 1) {
 			x = (x * y) % c;
 		}
-		y = (y * y) % c; // squaring the base
+		y = (y * y) % c; // kvadriranje baze.
 		b /= 2;
 	}
 	return x % c;
