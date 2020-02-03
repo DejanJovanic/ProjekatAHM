@@ -154,6 +154,9 @@
     <ClCompile Include="Server.c" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AdvancedHeapManager\AdvancedHeapManager.vcxproj">
+      <Project>{64f820a9-f19a-4f94-893d-5c7b10d59350}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\BaseOperations\BaseOperations.vcxproj">
       <Project>{4e873641-81b8-4f1c-bd74-403766c5813d}</Project>
     </ProjectReference>

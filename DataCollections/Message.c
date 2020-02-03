@@ -1,11 +1,9 @@
 #include "Message.h"
-#include <stdio.h>
-#include <stdlib.h>
 
-int Data_generate_message(char ** message, int moduo)
+
+int Data_generate_message(char ** message, int random_length)
 {
-	srand(time(NULL));
-	int length = rand() % moduo + 1 + 1;	//prvi +1 da nikad ne bude 0, drugi +1 za NULL terminator
+	int length = (random_length * 2000000) + 1 + 1;	//prvi +1 da nikad ne bude 0, drugi +1 za NULL terminator
 	*message = malloc(sizeof(char) * length);
 	for (int i = 0; i < length - 1; i++) {
 		(*message)[i] = '0' + (i % 10);

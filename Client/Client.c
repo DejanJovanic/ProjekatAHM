@@ -6,6 +6,7 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include "conio.h"
 
 
@@ -20,10 +21,12 @@
 #define SERVER_IP_ADDRESS "127.0.0.1"
 #define SERVER_PORT 27016
 #define CLIENTS_NO 10
-
+#define MESSAGE_MAX_SIZE 1000000000
 
 DWORD WINAPI client_thread(LPVOID lpParam);
 CRITICAL_SECTION cs;
+
+int lengths[CLIENTS_NO];	//random duzine poruka
 
 
 int main()
@@ -38,6 +41,15 @@ int main()
 	DWORD ids[CLIENTS_NO];
 	HANDLE threads[CLIENTS_NO];
 
+
+	unsigned seed = time(0);
+	
+	srand(seed);
+	int random_integer;
+	for (int index = 0; index < CLIENTS_NO; index++)
+	{
+		lengths[index] = (rand() % 400) + 100;
+	}
 
 	for (int i = 0; i < CLIENTS_NO; i++)
 	{
@@ -100,16 +112,30 @@ DWORD WINAPI client_thread(LPVOID param)
 	unsigned long int non_blocking_mode = 1;
 	result = ioctlsocket(connect_socket, FIONBIO, &non_blocking_mode);
 
-	length = Data_generate_message(&message, n+20);
+	length = Data_generate_message(&message, lengths[n]);
 	Base_custom_select(connect_socket, 'w');
 	Base_custom_send(connect_socket, message, length);
-	printf("Saljem na server: %s\n", message);
+	//printf("Saljem na server: %s\n", message);
+
+
+	clock_t start_time, end_time;
+	double cpu_time_used;
+	start_time = clock();
+
+	char* message_for_classic_malloc = malloc(length);
+	free(message_for_classic_malloc);
+
+
+	end_time = clock();
+	cpu_time_used = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
+	printf("Vreme potrebno za zauzimanje %d bajtova standardnim malloc i free je : %f\n", length, cpu_time_used);
+
 	free(message);
 	
 	Base_custom_select(connect_socket, 'r');
 	length = Base_custom_recieve(connect_socket, &message);
 	
-	printf("Primio od servera: %s\n", message);
+	//printf("Primio od servera: %s\n", message);
 	
 	free(message);
 	//LeaveCriticalSection(&cs);
