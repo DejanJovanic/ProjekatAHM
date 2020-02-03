@@ -41,7 +41,7 @@ void thread_free(void* pointer) {
 	Heap heap = NULL;
 	BOOL is_removed = _Dictionary_remove(pointer,&heap);
 
-	if(is_removed)
-		HeapManipulation_free_memory(pointer, heap);
+	if (is_removed)
+		HeapManipulationOperations_free_memory(_manager, pointer, heap);
 
 }

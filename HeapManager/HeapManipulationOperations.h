@@ -17,3 +17,5 @@
 BOOL HeapManipulationOperations_get_heap(HeapManager* manager, Heap* out_heap);
 
 void* HeapManipulationOperations_get_memory(HeapManager* manager, int memory_size,Heap* out_heap);
+
+BOOL HeapManipulationOperations_free_memory(HeapManager* manager, void* pointer, Heap* heap);

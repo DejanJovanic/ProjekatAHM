@@ -19,11 +19,23 @@ BOOL HeapManipulationOperations_get_heap(HeapManager* manager, Heap* out_heap) {
 }
 
 void* HeapManipulationOperations_get_memory(HeapManager* manager, int memory_size,Heap* out_heap) {
-	Heap heap;
-	if (HeapManipulationOperations_get_heap(manager, &heap)) {
-		*out_heap = heap;
-		return HeapManipulation_allocate_memory(memory_size, heap);
+	if (manager != NULL && memory_size > 0) {
+		Heap heap;
+		if (HeapManipulationOperations_get_heap(manager, &heap)) {
+			*out_heap = heap;
+			return HeapManipulation_allocate_memory(memory_size, heap);
+		}
+		else
+			return NULL;
 	}
 	else
 		return NULL;
+}
+
+BOOL HeapManipulationOperations_free_memory(HeapManager* manager, void* pointer, Heap* heap) {
+	if (manager != NULL && pointer != NULL && heap != NULL) {
+		return HeapManipulation_free_memory(pointer, heap);
+	}
+	else
+		return FALSE;
 }
