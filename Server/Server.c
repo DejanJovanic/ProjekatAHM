@@ -17,7 +17,7 @@
 #pragma comment (lib, "AdvApi32.lib")
 
 #define DEFAULT_PORT "27016"
-#define CLIENTS_NO 10
+#define CLIENTS_NO 100
 
 DWORD WINAPI worker_thread_function(LPVOID lpParam);
 CRITICAL_SECTION cs;

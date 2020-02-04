@@ -1,10 +1,14 @@
 #include "ThreadTests.h"
 
-void ThreadTests_custom_malloc_initialize(int number_of_threads){
+CRITICAL_SECTION cs;
+int counter = 0;
 
+
+void ThreadTests_custom_malloc_initialize(int number_of_threads){
+	InitializeCriticalSection(&cs);
 	clock_t start_time, end_time;
 	double cpu_time_used;
-	int number_of_bytes = 400000 / number_of_threads;
+	int number_of_bytes = 200000 / number_of_threads;
 
 	printf("\n\tCustom malloc i free funkcije\n");
 	
@@ -30,14 +34,16 @@ void ThreadTests_custom_malloc_initialize(int number_of_threads){
 	}
 	free(threads);
 
-
+	printf("NIJE NULL: %d elemenata!", counter);
+	counter = 0;
+	DeleteCriticalSection(&cs);
 	return 0;
 }
 void ThreadTests_malloc_initialize(int number_of_threads){
 	
 	clock_t start_time, end_time;
 	double cpu_time_used;
-	int number_of_bytes = 400000 / number_of_threads;
+	int number_of_bytes = 200000 / number_of_threads;
 
 	HANDLE* threads;
 	threads = (HANDLE)malloc(number_of_threads * sizeof(HANDLE));
@@ -75,7 +81,13 @@ DWORD WINAPI ThreadTests_custom_malloc_and_custom_free(LPVOID lpParam) {
 	for (int i = 0; i < 10000; i++) {
 		if (items[i] != NULL)
 		{
-			advanced_free(items[i]);
+			if (items[i] != NULL) {
+				advanced_free(items[i]);
+				EnterCriticalSection(&cs);
+				counter++;
+				LeaveCriticalSection(&cs);
+			}
+			
 		}
 	}
 

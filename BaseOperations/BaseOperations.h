@@ -23,7 +23,7 @@ void Base_custom_select(SOCKET s, char operation);
 **/
 void Base_custom_send(SOCKET s, char* niz, int brojBajtova);
 /**
-*	Base_custom_recieve() - Prima poruku nasumicne duzine
+*	Base_custom_recieve() - Prima poruku nasumicne duzine, a kao povratnu vrednost vraca broj primljenih bajta
 *
 *	s	: soket za konekciju
 *	niz	: adresa niza u koji cemo smestiti podatke

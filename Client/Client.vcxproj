@@ -160,9 +160,6 @@
     <ProjectReference Include="..\DataCollections\DataCollections.vcxproj">
       <Project>{081efba7-7b99-40f6-bdbb-2accd0ceb10b}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\DataSerialization\DataSerialization.vcxproj">
-      <Project>{420285e2-15b1-4ceb-8a5c-77d4502eb3f2}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
