@@ -9,13 +9,19 @@ int main(int argc, char* argv[])
 	}
 	ManagerInitialization_initialize_manager(atoi(argv[1]));
 	
-
+	//getc(stdin);
 	ThreadTests_custom_malloc_initialize(1);
+	//getc(stdin);
 	ThreadTests_custom_malloc_initialize(2);
+	//getc(stdin);
 	ThreadTests_custom_malloc_initialize(5);
+	//getc(stdin);
 	ThreadTests_custom_malloc_initialize(10);
+	//getc(stdin);
 	ThreadTests_custom_malloc_initialize(20);
+	//getc(stdin);
 	ThreadTests_custom_malloc_initialize(50);
+	//getc(stdin);
 	ManagerInitialization_destroy_manager();
 	//ThreadTests_malloc_initialize(1);
 	//ThreadTests_malloc_initialize(2);

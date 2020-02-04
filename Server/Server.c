@@ -16,15 +16,15 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-
 #define DEFAULT_PORT "27016"
 #define CLIENTS_NO 10
-DWORD WINAPI listen_thread_function(LPVOID lpParam);
 
+DWORD WINAPI worker_thread_function(LPVOID lpParam);
+CRITICAL_SECTION cs;
 int  main(void)
 {
 	ManagerInitialization_initialize_manager(5);
-
+	InitializeCriticalSection(&cs);
     SOCKET listen_socket = INVALID_SOCKET;
     SOCKET accepted_socket = INVALID_SOCKET;
 	int result;
@@ -85,14 +85,66 @@ int  main(void)
     }
 
 	printf("Server initialized, waiting for clients.\n");
-	DWORD id;
-	HANDLE listen_thread = CreateThread(NULL, 0, &listen_thread_function, &listen_socket, 0, &id);
 	
-	printf("Press any key to stop server.\n\n");
+
+	char* message;
+	int length = 0;
+	unsigned long mode = 1;
+	result = ioctlsocket(listen_socket, FIONBIO, &mode);
+	if (result != NO_ERROR)
+	{
+		printf("ioctlsocket za listen failed with error: %ld\n", result);
+	}
+	result = listen(listen_socket, SOMAXCONN);
+
+
+	HANDLE accepted_thread[CLIENTS_NO];
+	DWORD ids[CLIENTS_NO];
+	int counter = 0;
+
+	while (1)
+	{
+		if (counter != CLIENTS_NO)
+		{
+			Base_custom_select(listen_socket, 'r');
+		}
+		else
+			break;
+
+		struct sockaddr_in client_addr;
+		int client_addr_size = sizeof(struct sockaddr_in);
+		accepted_socket = accept(listen_socket, (struct sockaddr *)&client_addr, &client_addr_size);
+
+		if (accepted_socket == INVALID_SOCKET)
+		{
+			printf("accept failed with error: %d\n", WSAGetLastError());
+			closesocket(listen_socket);
+			WSACleanup();
+			return 1;
+		}
+		else
+		{
+			if (ioctlsocket(accepted_socket, FIONBIO, &mode) != 0)
+			{
+				printf("ioctlsocket failed with error.");
+				continue;
+			}
+			printf("New client request accepted (%d). Client address: %s : %d\n", counter, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+
+
+			accepted_thread[counter] = CreateThread(NULL, 0, &worker_thread_function, accepted_socket, 0, &ids[counter]);
+
+			counter++;
+		}
+	}
+
+
+	for (int i = 0; i < CLIENTS_NO; i++) {
+		WaitForSingleObject(accepted_thread[counter], INFINITE);
+	}
+
 	getchar();
 	
-	CloseHandle(listen_thread);
-
 	result = shutdown(listen_socket, SD_SEND);
     if (result == SOCKET_ERROR)
     {
@@ -103,6 +155,13 @@ int  main(void)
     }
 
 
+	for (int i = 0; i < CLIENTS_NO; i++) {
+		CloseHandle(accepted_thread[i]);
+	}
+
+
+
+	DeleteCriticalSection(&cs);
 	ManagerInitialization_destroy_manager();
     closesocket(listen_socket);
     closesocket(accepted_socket);
@@ -111,83 +170,35 @@ int  main(void)
     return 0;
 }
 
-DWORD WINAPI listen_thread_function(LPVOID param)
+DWORD WINAPI worker_thread_function(LPVOID param)
 {
 
+	SOCKET client_socket = (SOCKET)param;
 	char* message;
-	int length = 0;
-	SOCKET listen_socket = *((SOCKET*)(param));
-	unsigned long mode = 1;
-	int result = ioctlsocket(listen_socket, FIONBIO, &mode);
-	if (result != NO_ERROR)
-	{
-		printf("ioctlsocket za listen failed with error: %ld\n", result);
-	}
-	result = listen(listen_socket, SOMAXCONN);
 
-	SOCKET client_sockets[CLIENTS_NO];
+	Base_custom_select(client_socket, 'r');
+	int bytes_recieved = Base_custom_recieve(client_socket, &message);
+	//printf("Primio od klijenta: %s\n", message);
 
-	int counter = 0;
+	clock_t start_time, end_time;
+	double cpu_time_used;
+	start_time = clock();
 
-	while (1)
-	{
-		if (counter != CLIENTS_NO)
-		{
-			Base_custom_select(listen_socket, 'r');
-		}
-		else
-			return 0;
+	char* message_for_advanced_malloc = advanced_malloc(bytes_recieved);
+	advanced_free(message_for_advanced_malloc);
 
-		struct sockaddr_in client_addr;
-		int client_addr_size = sizeof(struct sockaddr_in);
-		client_sockets[counter] = accept(listen_socket, (struct sockaddr *)&client_addr, &client_addr_size);
+	end_time = clock();
+	cpu_time_used = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
 
-		if (client_sockets[counter] == INVALID_SOCKET)
-		{
-			printf("accept failed with error: %d\n", WSAGetLastError());
-			closesocket(listen_socket);
-			WSACleanup();
-			return 1;
-		}
-		else
-		{
-			if (ioctlsocket(client_sockets[counter], FIONBIO, &mode) != 0)
-			{
-				printf("ioctlsocket failed with error.");
-				continue;
-			}
-			printf("New client request accepted (%d). Client address: %s : %d\n", counter, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-			
-			Base_custom_select(client_sockets[counter], 'r');
-			int bytes_recieved = Base_custom_recieve(client_sockets[counter], &message);
-			//printf("Primio od klijenta: %s\n", message);
+	printf("Vreme potrebno za zauzimanje %d bajtova advanced malloc i free je : %f\n", bytes_recieved, cpu_time_used);
 
-			
-			clock_t start_time, end_time;
-			double cpu_time_used;
-			start_time = clock();
+	free(message);
 
-			char* message_for_advanced_malloc = advanced_malloc(bytes_recieved);
-			advanced_free(message_for_advanced_malloc);
-
-			end_time = clock();
-			cpu_time_used = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
-
-			printf("Vreme potrebno za zauzimanje %d bajtova advanced malloc i free je : %f\n", bytes_recieved, cpu_time_used);
-
-			free(message);
-
-
-			
-			//counter++;
-			//vracanje poruke nasumicne duzine
-			length = Data_generate_message(&message, counter + 10);
-			Base_custom_select(client_sockets[counter], 'w');
-			Base_custom_send(client_sockets[counter], message, length);
-			//printf("Saljem na klijenta: %s\n\n", message);
-			free(message);
-			counter++;
-		}
-	}
+	//vracanje poruke nasumicne duzine
+	int length = Data_generate_message(&message, 20);
+	Base_custom_select(client_socket, 'w');
+	Base_custom_send(client_socket, message, length);
+	closesocket(client_socket);
+	free(message);
 
 }
