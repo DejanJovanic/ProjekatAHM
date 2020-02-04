@@ -148,12 +148,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="HashTable.c" />
-    <ClCompile Include="list.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HashTable.h" />
-    <ClInclude Include="list.h" />
-    <ClInclude Include="uthash.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

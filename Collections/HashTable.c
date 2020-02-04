@@ -14,7 +14,7 @@ int _HashTable_modulo(int a, int b, int c) {
 	return x % c;
 }
 
-/* this function calculates (a*b)%c taking into account that a*b might overflow */
+///Funkcija racuna (a^b)%c i uzima u obzir da a^b moze da overflow-uje 
 long long _HashTable_mulmod(long long a, long long b, long long c) {
 	long long x = 0, y = a % c;
 	while (b > 0) {

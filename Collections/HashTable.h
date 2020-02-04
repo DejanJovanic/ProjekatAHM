@@ -1,21 +1,23 @@
 #pragma once
 #include <stdint.h>
 #include "Windows.h"
+
+
 typedef struct hash_node {
-	void* key;
-	void* value;
-	struct hash_node* next;
+	void* key; ///< Kljuc prema kojem se pretrazije HashTable.
+	void* value; ///< Vrednost koja se smesta u HashTable.
+	struct hash_node* next; ///< Pokazivac na sledeci element u bucket-u.
 } HashNode;
 
 typedef struct hash_table {
-	HashNode** _table;
-	int size;
-	int minimal_size;
-	int entries;
-	void*(*bucket_list_allocating_function)(int);
-	void(*bucket_list_free_function)(HashNode**);
-	void(*node_free_function)(HashNode*);
-	void*(*node_allocate_function)();
+	HashNode** _table; ///< Bucket-i. Niz pokazivaca na elemente.
+	int size; ///< Trenutna velicina tabele.
+	int minimal_size; ///< Minimalna velicina tabele. Potrebno da bude prost broj.
+	int entries; ///< Broj elemenata u tabeli.
+	void*(*bucket_list_allocating_function)(int); ///< Pokazivac na funkciju koja alocira memoriju za bucket-e.
+	void(*bucket_list_free_function)(HashNode**); ///< Pokazivac na funkciju koja oslobadja memoriju za bucket-e.
+	void(*node_free_function)(HashNode*); ///< Pokazivac na funkciju koja oslobadja memoriju za jedan element.
+	void*(*node_allocate_function)();///< Pokazivac na funkciju koja alocira memoriju za jedan element.
 } HashTable;
 
 /**
