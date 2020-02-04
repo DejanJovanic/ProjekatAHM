@@ -18,7 +18,7 @@ void* advanced_malloc(int bytes) {
 			is_inserted = _Dictionary_insert(pointer, heap);
 		}
 
-		if (is_inserted == FALSE) {
+		if (is_inserted == FALSE && pointer != NULL) {
 			HeapManipulation_free_memory(pointer, heap);
 			pointer = NULL;
 		}

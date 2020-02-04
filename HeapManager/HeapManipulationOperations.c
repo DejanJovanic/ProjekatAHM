@@ -27,6 +27,8 @@ void* HeapManipulationOperations_get_memory(HeapManager* manager, int memory_siz
 				*out_heap = heap;
 				return ret;
 			}
+			else
+				return NULL;
 		}
 		else
 			return NULL;
